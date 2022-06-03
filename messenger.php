@@ -37,7 +37,9 @@
                         </ol>
                         <div class="row">
                             <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" class="user-image">
-                            <h4 style="margin-bottom: 0px;">Miro Badev</h4>
+                            <a href="user-profile.php" style="color: inherit; text-decoration: none;">
+                                <h4 style="margin-bottom: 0px;">Miro Badev</h4>
+                            </a>
                             <div class="col-md-12 grid-margin">
                                 <div class="d-flex align-items-center">                              
                                     <p style="margin-bottom: 0;">Status:&nbsp&nbsp</p><span style="height: 15px; width: 15px; background-color: #6cc16f; border-radius: 50%; display: inline-block;"></span>
