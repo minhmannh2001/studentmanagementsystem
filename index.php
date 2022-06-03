@@ -27,13 +27,14 @@
                             <!-- <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li> -->
                             <!-- <li class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a></li> -->
                             <!-- <li class="nav-item"><a class="nav-link" href="faq.html">FAQ</a></li> -->
-                            <li class="nav-item dropdown">
+                            <!-- <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarDropdownBlog" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Login</a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownBlog">
-                                    <li><a class="dropdown-item" href="blog-home.html">Admin</a></li>
-                                    <li><a class="dropdown-item" href="blog-post.html">Student</a></li>
+                                    <li><a class="dropdown-item" href="login.html">Admin</a></li>
+                                    <li><a class="dropdown-item" href="login.html">Student</a></li>
                                 </ul>
-                            </li>
+                            </li> -->
+                            <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
                             <!-- <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle" id="navbarDropdownPortfolio" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">Portfolio</a>
                                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdownPortfolio">
@@ -54,7 +55,7 @@
                                 <h1 class="display-5 fw-bolder text-white mb-2">Student Management System</h1>
                                 <p class="lead fw-normal text-white-50 mb-4">This tool has productively taken over the workload of the admin department with its well-organized, easy, and reliable online school management software</p>
                                 <div class="d-grid gap-3 d-sm-flex justify-content-sm-center justify-content-xl-start">
-                                    <a class="btn btn-primary btn-lg px-4 me-sm-3" href="admin-panel.html">Sign up</a>
+                                    <a class="btn btn-primary btn-lg px-4 me-sm-3" href="register.html">Sign up</a>
                                     <!-- <a class="btn btn-outline-light btn-lg px-4" href="#!">Learn More</a> -->
                                 </div>
                             </div>
