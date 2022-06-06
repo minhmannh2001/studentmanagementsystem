@@ -35,7 +35,7 @@
 
         if ($result) {
             $user_id = $result['user_id'];
-            $user_username = $result['user_account'];
+            $user_account = $result['user_account'];
             $user_firstname = $result['user_firstname'];
             $user_lastname = $result['user_lastname'];
             $user_class = $result['user_class'];
@@ -44,7 +44,7 @@
             $user_phone_number = $result['user_phone_number'];
             $user_position = $result['user_position'];
             $user_email = $result['user_email'];
-            if ($user_class == 'Not Set' or $user_date_of_birth == 'Not Set' or $user_gender == 'Not Set' or $user_phone_number == 'Not Set') {
+            if ($user_class == 'Not Set' or $user_date_of_birth == 'Not Set' or $user_gender == 'Not Set' or $user_phone_number == 'Not Set' and $user_profile == '') {
                 $warning = 'You need to provide enough information to use full functionalities of application.';
             }
         } else {
@@ -101,7 +101,7 @@
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Username:&nbsp</b>
-                                                    <p><?php echo "$user_username" ?></p>
+                                                    <p><?php echo "$user_account"; ?></p>
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Position:&nbsp</b>

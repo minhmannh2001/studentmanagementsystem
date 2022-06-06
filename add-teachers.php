@@ -1,3 +1,65 @@
+<?php
+    $warning = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    if (isset($_POST['submit'])) {
+        $student_firstname = $_POST['studentfirstname'];
+        $student_lastname = $_POST['studentlastname'];
+        $student_email = $_POST['studentemail'];
+        $student_phone_number = $_POST['studentphone'];
+        $student_class = $_POST['studentclass'];
+        $student_gender = $_POST['studentgender'];
+        $student_birth_of_date = $_POST['studentdob'];
+        // student photo
+        $student_photo_name = $_FILE["studentphoto"]["name"];
+        $student_photo_size = $_FILE["studentphoto"]["size"];
+        $student_photo_tmpname = $_FILE["studentphoto"]["tmp_name"];
+        // Validate image
+        $valid_image_extension = ["jpg", "jpeg", "png"];
+        $student_photo_extension = explode('.', $student_photo_name);
+        $student_photo_extension = strtolower(end($student_photo_extension));
+
+        echo "<script> console.log($student_photo_extension); </script>";
+
+        if (!in_array($student_photo_extension, $valid_image_extension)) {
+            echo "
+                <script> alert('Invalid image extension.') </script>
+            ";
+        } else if ($student_photo_size > 100000) {
+            echo "
+                <script> alert('Image size is too large.') </script>
+            ";
+        } else {
+            $student_photo_newname = uniqid();
+            $student_photo_newname = $student_photo_newname . $student_photo_extension;
+
+            move_uploaded_file($student_photo_newname, 'images/' . $student_photo_newname);
+        }
+        // End of validation
+        $student_account = $_POST['studentaccount'];
+        $student_password = $_POST['studentpassword'];
+    }
+
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -28,9 +90,12 @@
                                 <div class="card">
                                     <div class="card-body">
                                         <div class="row">
-                                            <form action="action_page.php">
-                                                <label for="studentname">Name</label>
-                                                <input required="true" type="text" id="studentname" name="studentname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                            <form action="<?php $_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data" method="POST">
+                                                <label for="studentfirstname">First Name</label>
+                                                <input required="true" type="text" id="studentfirstname" name="studentfirstname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
+                                                <label for="studentlastname">Last Name</label>
+                                                <input required="true" type="text" id="studentlastname" name="studentlastname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                 
                                                 <label for="studentemail">Email</label>
                                                 <input type="text" id="studentemail" name="studentemail" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
@@ -39,10 +104,17 @@
                                                 <input type="text" id="studentphone" name="studentphone" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <label for="studentclass">Class</label>
-                                                <select required="true" id="studentclass" name="studentclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <select id="studentclass" name="studentclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                     <option value="">Choose Class</option>
-                                                    <option value="10A">10A</option>
-                                                    <option value="10B">10B</option>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Classes WHERE class_homeroom_teacher_id IS NULL;");
+                                                        $stmt->execute();
+                                                        $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        foreach ($classes as $class) {
+                                                            $class_name = $class['class_name'];
+                                                            echo "<option value='$class_name'>$class_name</option>";
+                                                        }
+                                                    ?>
                                                 </select>
 
                                                 <label for="studentgender">Gender</label>
@@ -64,9 +136,9 @@
                                                 <input required="true" type="text" id="studentaccount" name="studentaccount" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <label for="studentpassword">Password</label>
-                                                <input required="true" type="text" id="studentpassword" name="studentpassword" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <input required="true" type="password" id="studentpassword" name="studentpassword" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
-                                                <input type="submit" value="Add" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                                <input type="submit" value="Add" name="submit" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
                                             </form>
                                         </div>
                                     </div>

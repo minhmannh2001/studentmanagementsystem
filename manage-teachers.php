@@ -6,6 +6,12 @@
     $email = $_SESSION['email'];
     $position = $_SESSION['position'];
     
+    // username of deleted user
+    $delete_username = '';
+
+    $just_delete = $_SESSION['just-delete'];
+    $_SESSION['just-delete'] = 'false';
+
     $db_servername = "localhost";
     $db_username = "root";
     $db_password = "";
@@ -15,7 +21,6 @@
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-        
     } catch(PDOException $e) {
         echo "Connection failed: " . $e->getMessage();
         header('Location: 500.html', true, 301);
@@ -45,8 +50,6 @@
                 text-decoration: underline;
                 cursor: pointer;
             }
-        </style>
-        <style>
         
             /* Set a style for all buttons */
             .btn-modal {
@@ -152,10 +155,10 @@
             <div class="container-modal">
             <h1>Delete User</h1>
             <p>Are you sure you want to delete this user?</p>
-            <input type="hidden">
+            <!-- <input type='hidden' value='<?php $delete_username ?>' name='username'> -->
             <div class="clearfix">
                 <button type="button" onclick="modal_cancel_btn()" class="cancelbtn btn-modal">Cancel</button>
-                <button type="submit" class="deletebtn btn-modal">Delete</button>
+                <button type="button" onclick="modal_delete_btn()" class="deletebtn btn-modal">Delete</button>
             </div>
             </div>
         </form>
@@ -171,7 +174,7 @@
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
                             <li class="breadcrumb-item active">Manage Teachers</li>
                         </ol>
-                        <a href="add-students.php" style="background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">Add new</a>
+                        <a href="add-teachers.php" style="background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">Add new</a>
                         <?php
                             $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher';");
                             $stmt->execute();
@@ -244,8 +247,10 @@
                                                         &nbsp
                                                         |
                                                         &nbsp
-                                                        <button class='link-button' onclick='modal_confirm_appear()'>Delete</button>
-                                                        
+                                                        <form action='delete-user.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
+                                                            <input type='hidden' value='$teacher_username' name='username'>
+                                                            <button class='link-button' type='submit'>Delete</button>
+                                                        </form>
                                                     </td>
                                                 </tr>";
                                                 $count += 1;
@@ -257,6 +262,7 @@
                         </div>
                     </div>
                 </main>
+                <div id="snackbar">Delete successfully.</div>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
                         <div class="d-flex align-items-center justify-content-between small">
@@ -276,7 +282,16 @@
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
         <script src="js/datatables-simple-demo.js"></script>
         <script>
-            function modal_confirm_appear() {
+            let isConfirmed = false;
+            let form_number = 0;
+
+            function modal_delete_btn() {
+                isConfirmed = true;
+                document.querySelector('#delete-form' + form_number).submit();
+            }
+
+            function modal_confirm_appear(form_number_param) {
+                form_number = form_number_param;
                 document.getElementById('id01').style.display='block';
             }
 
@@ -293,6 +308,30 @@
                     modal.style.display = "none";
                 }
             }
+
+            function mySnackbar() {
+                // Get the snackbar DIV
+                var x = document.getElementById("snackbar");
+                
+                console.log(x);
+
+                // Add the "show" class to DIV
+                x.className = "show";
+
+                // After 3 seconds, remove the show class from DIV
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            } 
+
+            <?php
+                if ($just_delete == 'true') {
+                    echo "
+                        window.onload = function() {
+                            mySnackbar()
+                        };
+                    ";
+                }
+            ?>
+            
         </script>
     </body>
 </html>
