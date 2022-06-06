@@ -1,3 +1,64 @@
+<?php
+    $warning = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+    
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    $user_profile = $_GET['username'];
+
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+        $password = md5($password);
+
+        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account OR user_email = :user_email");
+        if ($user_profile == '') {
+            $stmt->bindParam(':user_account', $username);
+            $stmt->bindParam(':user_email', $email);
+        } else {
+            $email_profile = 'random';
+            $stmt->bindParam(':user_account', $user_profile);
+            $stmt->bindParam(':user_email', $email_profile);
+        }
+        $stmt->execute();
+
+        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if ($result) {
+            $user_id = $result['user_id'];
+            $user_username = $result['user_account'];
+            $user_firstname = $result['user_firstname'];
+            $user_lastname = $result['user_lastname'];
+            $user_class = $result['user_class'];
+            $user_gender = $result['user_gender'];
+            $user_date_of_birth = $result['user_date_of_birth'];
+            $user_phone_number = $result['user_phone_number'];
+            $user_position = $result['user_position'];
+            $user_email = $result['user_email'];
+            if ($user_class == 'Not Set' or $user_date_of_birth == 'Not Set' or $user_gender == 'Not Set' or $user_phone_number == 'Not Set') {
+                $warning = 'You need to provide enough information to use full functionalities of application.';
+            }
+        } else {
+            header('Location: 500.html', true, 301);
+        }
+    } catch(PDOException $e) {
+        // roll back the transaction if something failed
+        $conn->rollback();
+        echo "Error: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -30,48 +91,87 @@
                                         <img src="https://dummyimage.com/300x400/343a40/6c757d" alt="">
                                         <div class="d-flex flex-column" style="margin-left: 50px;">
                                             <div class="d-flex flex-column" style="background-color: #15395a; padding: 20px 30px; border-radius: 5px; margin-bottom: 20px;">
-                                                <h3 style="color: white;">Christiano Ronaldo</h3>
-                                                <strong style="color: #ceaa4d;">Teacher</strong>
+                                                <h3 style="color: white;"><?php echo "$user_firstname" . " " . "$user_lastname" ?></h3>
+                                                <strong style="color: #ceaa4d;"><?php echo "$user_position" ?></strong>
                                             </div>
                                             <div>
                                                 <div class="d-flex">
                                                     <b>ID:&nbsp</b>
-                                                    <p>T1</p>
+                                                    <p><?php echo "$user_id" ?></p>
+                                                </div>
+                                                <div class="d-flex">
+                                                    <b>Username:&nbsp</b>
+                                                    <p><?php echo "$user_username" ?></p>
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Position:&nbsp</b>
-                                                    <p>Teacher</p>
+                                                    <p><?php echo "$user_position" ?></p>
                                                 </div>
                                                 <div class="d-flex">
-                                                    <b>Class:&nbsp</b>
-                                                    <p>10A</p>
-                                                </div>
-                                                <div class="d-flex">
-                                                    <b>Gender:&nbsp</b>
-                                                    <p>Male</p>
+                                                    <div class="d-flex">
+                                                        <b>Class:&nbsp</b>
+                                                        <p>
+                                                            <?php if ($user_class != '') {
+                                                                echo "$user_class";
+                                                            } else {
+                                                                echo 'Not Set';
+                                                            }
+                                                            ?>
+                                                        </p>
+                                                    </div>
+                                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                                    <div class="d-flex">
+                                                        <b>Gender:&nbsp</b>
+                                                        <p>
+                                                            <?php if ($user_gender != '') {
+                                                                echo "$user_gender";
+                                                            } else {
+                                                                echo 'Not Set';
+                                                            }
+                                                            ?>
+                                                        </p>
+                                                    </div>
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Date Of Birth:&nbsp</b>
-                                                    <p>06/03/2001</p>
+                                                    <p>
+                                                        <?php if ($user_date_of_birth != '') {
+                                                            echo "$user_date_of_birth";
+                                                        } else {
+                                                            echo 'Not Set';
+                                                        }
+                                                        ?>
+                                                    </p>
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Email:&nbsp</b>
-                                                    <p>teacher1@gmail.com</p>
+                                                    <p>
+                                                        <?php echo "$user_email" ?>
+                                                    </p>
                                                 </div>
                                                 <div class="d-flex">
                                                     <b>Phone Number:&nbsp</b>
-                                                    <p>0941425436</p>
+                                                    <p><?php echo "$user_phone_number" ?></p>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
-                                <a href="" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</a>
-                                <form action="">
-                                    <label for="message" style="margin-top: 20px;"><h5>Write message:</h5></label>
-                                    <textarea required="true" placeholder="Write something..." id="message" name="message" style="width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;"></textarea>                                     
-                                    <input type="submit" value="Send" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
-                                </form>
+                                <?php
+                                    if ($warning != '') {
+                                        echo "<p style='color: red;'>$warning</p>";
+                                    }
+                                ?>
+                                <a href="user-detail.php" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</a>
+                                <?php
+                                    if ($user_profile != "") {
+                                        echo '<form action="">
+                                            <label for="message" style="margin-top: 20px;"><h5>Write message:</h5></label>
+                                            <textarea required="true" placeholder="Write something..." id="message" name="message" style="width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;"></textarea>                                     
+                                            <input type="submit" value="Send" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 15px;">
+                                        </form>';
+                                    }
+                                ?>
                             </div>
                         </div>
                     </div>

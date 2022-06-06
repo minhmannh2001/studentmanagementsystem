@@ -81,7 +81,10 @@
                     </div>
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                        teacher1
+                        <?php
+                            $user_username = $_SESSION['username'];
+                            echo "$user_username";
+                        ?>
                     </div>
                 </nav>
             </div>

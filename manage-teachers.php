@@ -1,3 +1,28 @@
+<?php
+    $warning = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+    
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+        
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,14 +31,136 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Tables - Student Management System</title>
+        <title>Manage Teachers - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+        <style>
+            .link-button {
+                background: none!important;
+                border: none;
+                padding: 0!important;
+                color: #1774fd;
+                text-decoration: underline;
+                cursor: pointer;
+            }
+        </style>
+        <style>
+        
+            /* Set a style for all buttons */
+            .btn-modal {
+                background-color: #04AA6D;
+                color: white;
+                padding: 14px 20px;
+                margin: 8px 0;
+                border: none;
+                cursor: pointer;
+                width: 100%;
+                opacity: 0.9;
+            }
+
+            .btn-modal:hover {
+                opacity:1;  
+            }
+
+            /* Float cancel and delete buttons and add an equal width */
+            .cancelbtn, .deletebtn {
+                float: left;
+                width: 50%;
+            }
+
+            /* Add a color to the cancel button */
+            .cancelbtn {
+                background-color: #ccc;
+                color: black;
+            }
+
+            /* Add a color to the delete button */
+            .deletebtn {
+                background-color: #f44336;
+            }
+
+            /* Add padding and center-align text to the container */
+            .container-modal {
+                padding: 16px;
+                text-align: center;
+            }
+
+            /* The Modal (background) */
+            .modal-confirm {
+                display: none; /* Hidden by default */
+                position: fixed; /* Stay in place */
+                z-index: 1; /* Sit on top */
+                left: 0;
+                top: 0;
+                width: 100%; 
+                height: 100%; /* Full height */
+                overflow: auto; /* Enable scroll if needed */
+                background-color: #343a40;
+                padding-top: 50px;
+            }
+
+            /* Modal Content/Box */
+            .modal-content {
+                background-color: #fefefe;
+                margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+                border: 1px solid #888;
+                width: 50%; /* Could be more or less, depending on screen size */
+            }
+
+            /* Style the horizontal ruler */
+            hr {
+                border: 1px solid #f1f1f1;
+                margin-bottom: 25px;
+            }
+
+            /* The Modal Close Button (x) */
+            .close {
+                position: absolute;
+                right: 35px;
+                top: 15px;
+                font-size: 40px;
+                font-weight: bold;
+                color: #f1f1f1;
+            }
+
+            .close:hover,
+            .close:focus {
+                color: #f44336;
+                cursor: pointer;
+            }
+
+            .clearfix::after {
+                content: "";
+                clear: both;
+                display: table;
+            }
+
+            /* Change styles for cancel button and delete button on extra small screens */
+            @media screen and (max-width: 300px) {
+                .cancelbtn, .deletebtn {
+                    width: 100%;
+                }
+            }
+        </style>
     </head>
     <body class="sb-nav-fixed">
-    <?php include 'admin-panel-topbar.php' ?>
+        <div id="id01" class="modal-confirm">
+        <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+        <form class="modal-content" action="delete-user.php" method="POST">
+            <div class="container-modal">
+            <h1>Delete User</h1>
+            <p>Are you sure you want to delete this user?</p>
+            <input type="hidden">
+            <div class="clearfix">
+                <button type="button" onclick="modal_cancel_btn()" class="cancelbtn btn-modal">Cancel</button>
+                <button type="submit" class="deletebtn btn-modal">Delete</button>
+            </div>
+            </div>
+        </form>
+        </div>
+        <?php include 'admin-panel-topbar.php' ?>
         <div id="layoutSidenav">
         <?php include 'admin-panel-sidebar.php' ?>
             <div id="layoutSidenav_content">
@@ -25,7 +172,13 @@
                             <li class="breadcrumb-item active">Manage Teachers</li>
                         </ol>
                         <a href="add-students.php" style="background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">Add new</a>
-                        <h5 style="margin-top: 20px;">Total Teachers: 2</h5>
+                        <?php
+                            $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher';");
+                            $stmt->execute();
+                            $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                            $nb_teachers = count($teachers);
+                            echo "<h5 style='margin-top: 20px;'>Total Teachers: $nb_teachers</h5>";
+                        ?>
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
@@ -58,34 +211,46 @@
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                        <tr>
-                                            <td>1</td>
-                                            <td>T1</td>
-                                            <td>Tiger Nixon</td>
-                                            <td>teacher1</td>
-                                            <td>10A</td>
-                                            <td>teacher1@gmail.com</td>
-                                            <td>1/6/2022</td>
-                                            <td>
-                                                <a href="">More</a>
-                                                |
-                                                <a href="">Delete</a>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>2</td>
-                                            <td>T2</td>
-                                            <td>Garrett Winters</td>
-                                            <td>teacher2</td>
-                                            <td>10B</td>
-                                            <td>teacher2@gmail.com</td>
-                                            <td>1/6/2022</td>
-                                            <td>
-                                                <a href="">More</a>
-                                                |
-                                                <a href="">Delete</a>
-                                            </td>
-                                        </tr>
+                                        <?php
+                                            $count = 1;
+                                            $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher';");
+                                            $stmt->execute();
+                                            $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                            foreach ($teachers as $teacher) {
+                                                $teacher_id = $teacher['user_id'];
+                                                $teacher_name = $teacher['user_firstname'] . ' ' . $teacher['user_lastname'];
+                                                $teacher_username = $teacher['user_account'];
+                                                if ($teacher['user_class'] == '') {
+                                                    $teacher_class = 'Not Set';
+                                                }
+                                                $teacher_email = $teacher['user_email'];
+                                                $teacher_start_date = $teacher['user_start_date'];
+                                                $teacher_start_date = date_create($teacher_start_date);
+                                                $teacher_start_date = date_format($teacher_start_date, "d/m/Y");
+                                                echo "
+                                                <tr>
+                                                    <td>$count</td>
+                                                    <td>$teacher_id</td>
+                                                    <td>$teacher_name</td>
+                                                    <td>$teacher_username</td>
+                                                    <td>$teacher_class</td>
+                                                    <td>$teacher_email</td>
+                                                    <td>$teacher_start_date</td>
+                                                    <td class='d-flex'>
+                                                        <form action='user-profile.php' method='GET'>
+                                                            <input type='hidden' value='$teacher_username' name='username'>
+                                                            <button class='link-button' type='submit'>More</button>
+                                                        </form>
+                                                        &nbsp
+                                                        |
+                                                        &nbsp
+                                                        <button class='link-button' onclick='modal_confirm_appear()'>Delete</button>
+                                                        
+                                                    </td>
+                                                </tr>";
+                                                $count += 1;
+                                            }
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>
@@ -110,5 +275,24 @@
         <script src="js/scripts2.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
         <script src="js/datatables-simple-demo.js"></script>
+        <script>
+            function modal_confirm_appear() {
+                document.getElementById('id01').style.display='block';
+            }
+
+            function modal_cancel_btn() {
+                document.getElementById('id01').style.display='none';
+            }
+
+            // Get the modal
+            var modal = document.getElementById('id01');
+
+            // When the user clicks anywhere outside of the modal, close it
+            window.onclick = function(event) {
+                if (event.target == modal) {
+                    modal.style.display = "none";
+                }
+            }
+        </script>
     </body>
 </html>
