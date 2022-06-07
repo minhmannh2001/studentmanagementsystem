@@ -13,154 +13,164 @@
     $db_password = "";
     $db_name = "test";
 
+    $user_detail = $_POST['user_username'];
+    if ($user_detail == "") {
+        $user_detail = $_POST['useraccount'];
+    }
+    $current_username = $_POST['username'];
+    if ($current_username == "") {
+        $current_username = $username;
+    }
+
+    $allow_change = false;
+
+    if ($user_detail == $current_username) {
+        $allow_change = true;
+    } else if ($position == 'Teacher') {
+        $allow_change = true;
+    }
+
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
-        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account OR user_email = :user_email");
-        $stmt->bindParam(':user_account', $user_account);
-        $stmt->bindParam(':user_email', $user_email);
+        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account");
+        $stmt->bindParam(':user_account', $user_detail);
         $stmt->execute();
 
-        $result = $stmt->fetchAll();
-        $count = count($result);
+        $result = $stmt->fetch();
         
-        if ($count > 0) {
-            $error = 'User already exists';
-            // echo "<script> alert('User already exists.') </script>";
+        $user_firstname = $result['user_firstname'];
+        $user_lastname = $result['user_lastname'];
+        $user_id = $result['user_id'];
+        $user_class = $result['user_class'];
+        $user_account = $result['user_account'];
+        if ($result['user_class'] == '') {
+            $user_class = 'Not Set';
         }
-
-        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_phone_number = :user_phone_number");
-        $stmt->bindParam(':user_phone_number', $user_phone_number);
-        $stmt->execute();
-
-        $result = $stmt->fetchAll();
-        $count = count($result);
-        
-        if ($count > 0) {
-            $error = 'This phone number has been used.';
-            // echo "<script> alert('This phone number has been used.') </script>";
+        $user_email = $result['user_email'];
+        $user_gender = $result['user_gender'];
+        $user_password = $result['user_password'];
+        $user_date_of_birth = $result['user_date_of_birth'];
+        if ($user_date_of_birth != "") {
+            $user_date_of_birth = date_create($user_date_of_birth);
+            $user_date_of_birth = date_format($user_date_of_birth, "Y-m-d");
         }
-
+        $user_photo = $result['user_photo'];
+        $user_photo_path = "images/" . $user_photo;
     } catch(PDOException $e) {
         // roll back the transaction if something failed
         $conn->rollback();
         echo "Error: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
     }
 
     if (isset($_POST['submit'])) {
-        $user_firstname = $_POST['userfirstname'];
-        $user_lastname = $_POST['userlastname'];
-        $user_email = $_POST['useremail'];
-        $user_phone_number = $_POST['userphone'];
-        $user_class = $_POST['userclass'];
-        $user_gender = $_POST['usergender'];
-        $user_date_of_birth = $_POST['userdob'];
-        // user photo
-        $user_photo_name = $_FILES["userphoto"]["name"];
-        $user_photo_size = $_FILES["userphoto"]["size"];
-        $user_photo_tmpname = $_FILES["userphoto"]["tmp_name"];
-        // Validate image
-        $valid_image_extension = ["jpg", "jpeg", "png"];
-        $user_photo_extension = explode('.', $user_photo_name);
-        $user_photo_extension = strtolower(end($user_photo_extension));
+        try {
 
-        if (!in_array($user_photo_extension, $valid_image_extension)) {
-            echo "
-                <script> alert('Invalid image extension.') </script>
-            ";
-            echo "<script> console.log($user_photo_extension); </script>";
-        } else if ($user_photo_size > 100000) {
-            echo "
-                <script> alert('Image size is too large.') </script>
-            ";
-        } else {
-            $user_photo_newname = uniqid();
-            $user_photo_newname = $user_photo_newname . '.' . $user_photo_extension;
-
-            if (move_uploaded_file($user_photo_tmpname, 'images/' . $user_photo_newname)) {
-                // echo "<script> alert('Upload success.') </script>";
+            $user_email = $_POST['useremail'];
+            $user_phone_number = $_POST['userphone'];
+            $allow_change_class = false;
+            if ($position == 'Teacher') {
+                $allow_change_class = true;
+            }
+            if ($allow_change_class) {
+                $user_class = $_POST['userclass'];
             } else {
-                // echo "<script> alert('Upload fail.') </script>";
+                $user_class = "";
+            }
+            $user_gender = $_POST['usergender'];
+            $user_date_of_birth = $_POST['userdob'];
+            // user photo
+            $user_photo_name = $_FILES["userphoto"]["name"];
+            if ($user_photo_name != "") {
+                $user_photo_size = $_FILES["userphoto"]["size"];
+                $user_photo_tmpname = $_FILES["userphoto"]["tmp_name"];
+                // Validate image
+                $valid_image_extension = ["jpg", "jpeg", "png"];
+                $user_photo_extension = explode('.', $user_photo_name);
+                $user_photo_extension = strtolower(end($user_photo_extension));
+    
+                if (!in_array($user_photo_extension, $valid_image_extension)) {
+                    echo "
+                        <script> alert('Invalid image extension.') </script>
+                    ";
+                    echo "<script> console.log($user_photo_extension); </script>";
+                } else if ($user_photo_size > 100000) {
+                    echo "
+                        <script> alert('Image size is too large.') </script>
+                    ";
+                } else {
+                    $user_photo_newname = uniqid();
+                    $user_photo_newname = $user_photo_newname . '.' . $user_photo_extension;
+    
+                    if (move_uploaded_file($user_photo_tmpname, 'images/' . $user_photo_newname)) {
+                        // echo "<script> alert('Upload success.') </script>";
+                    } else {
+                        // echo "<script> alert('Upload fail.') </script>";
+                    }
+                }
+            } else {
+                $user_photo_newname = "";
+            }
+            // End of validation
+            $user_newpassword = $_POST['userpassword'];
+            $user_raw_newpassword = $user_newpassword;
+            $user_newpassword = md5($user_newpassword);
+
+            $user_confirm_newpassword = $_POST['userconfirmpassword'];
+            $user_confirm_newpassword = md5($user_confirm_newpassword);
+
+            if ($user_raw_newpassword != "") {
+                if ($user_password == $user_newpassword) {
+                    $error = "Password is the same.";
+                } else if ($user_newpassword != $user_confirm_newpassword) {
+                    $error = "Password and Confirm Password field should be same.";
+                }
+                if (strlen($user_raw_newpassword) < 6) {
+                    $error = "Enter a password greater than 6 characters";
+                }
+            }
+
+            if ($error == "") {
+                if ($user_date_of_birth != "") {
+                    $stmt = $conn->prepare("UPDATE Users SET user_email=:user_email, user_phone_number=:user_phone_number, user_gender=:user_gender, user_photo=:user_photo, user_date_of_birth=:user_date_of_birth, user_class=:user_class, user_password=:user_password  WHERE user_account=:user_account;");
+                    $stmt->bindParam(':user_email', $user_email);
+                    $stmt->bindParam(':user_phone_number', $user_phone_number);
+                    $stmt->bindParam(':user_gender', $user_gender);
+                    $stmt->bindParam(':user_photo', $user_photo_newname);
+                    $stmt->bindParam(':user_date_of_birth', $user_date_of_birth);
+                    $stmt->bindParam(':user_class', $user_class);
+                    $stmt->bindParam(':user_password', $user_password);
+                    $stmt->bindParam(':user_account', $user_detail);
+                    $stmt->execute();
+                }
+                else {
+                    $stmt = $conn->prepare("UPDATE Users SET user_email=:user_email, user_phone_number=:user_phone_number, user_gender=:user_gender, user_photo=:user_photo, user_class=:user_class, user_password=:user_password  WHERE user_account=:user_account;");
+                    $stmt->bindParam(':user_email', $user_email);
+                    $stmt->bindParam(':user_phone_number', $user_phone_number);
+                    $stmt->bindParam(':user_gender', $user_gender);
+                    $stmt->bindParam(':user_photo', $user_photo_newname);
+                    $stmt->bindParam(':user_class', $user_class);
+                    $stmt->bindParam(':user_password', $user_password);
+                    $stmt->bindParam(':user_account', $user_detail);
+                    $stmt->execute();
+
+                    $stmt = $conn->prepare("UPDATE Users SET user_date_of_birth = NULL WHERE user_account=:user_account;");
+                    $stmt->bindParam(':user_account', $user_detail);
+                    $stmt->execute();
+                }
+                $_SESSION['change-information'] = "true";
             }
         }
-        // End of validation
-        $user_account = $_POST['useraccount'];
-        $user_password = $_POST['userpassword'];
-        $user_password = md5($user_password);
-
-        try {
-            $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
-            // set the PDO error mode to exception
-            $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-            
-            $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account OR user_email = :user_email");
-            $stmt->bindParam(':user_account', $user_account);
-            $stmt->bindParam(':user_email', $user_email);
-            $stmt->execute();
-
-            $result = $stmt->fetchAll();
-            $count = count($result);
-            
-            if ($count > 0) {
-                $error = 'User already exists';
-                // echo "<script> alert('User already exists.') </script>";
-            }
-
-            $stmt = $conn->prepare("SELECT * FROM Users WHERE user_phone_number = :user_phone_number");
-            $stmt->bindParam(':user_phone_number', $user_phone_number);
-            $stmt->execute();
-
-            $result = $stmt->fetchAll();
-            $count = count($result);
-            
-            if ($count > 0) {
-                $error = 'This phone number has been used.';
-                // echo "<script> alert('This phone number has been used.') </script>";
-            }
-
-        } catch(PDOException $e) {
+        catch(PDOException $e) {
             // roll back the transaction if something failed
             $conn->rollback();
             echo "Error: " . $e->getMessage();
+            header('Location: 500.html', true, 301);
         }
-    }
     
-    try {
-        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
-        // set the PDO error mode to exception
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        if (isset($_POST['submit']) and $error=="") {
-            $stmt = $conn->prepare("INSERT INTO Users (user_firstname, user_lastname, user_email, user_phone_number, user_class, user_gender, user_date_of_birth, user_photo, user_account, user_password, user_position) 
-            VALUES (:user_firstname, :user_lastname, :user_email, :user_phone_number, :user_class, :user_gender, :user_date_of_birth, :user_photo, :user_account, :user_password, :user_position)");
-            $stmt->bindParam(':user_firstname', $user_firstname);
-            $stmt->bindParam(':user_lastname', $user_lastname);
-            $stmt->bindParam(':user_email', $user_email);
-            $stmt->bindParam(':user_phone_number', $user_phone_number);
-            $stmt->bindParam(':user_class', $user_class);
-            $stmt->bindParam(':user_gender', $user_gender);
-            $stmt->bindParam(':user_date_of_birth', $user_date_of_birth);
-            $stmt->bindParam(':user_photo', $user_photo_newname);
-            $stmt->bindParam(':user_account', $user_account);
-            $stmt->bindParam(':user_password', $user_password);
-            $user_position = 'user';
-            $stmt->bindParam(':user_position', $user_position);
-            $stmt->execute();
-
-            $user_firstname = "";
-            $user_lastname = "";
-            $user_email = "";
-            $user_phone_number = "";
-            $user_account = "";
-
-            $_SESSION['change-information'] = "true";
-        }
-
-    } catch(PDOException $e) {
-        echo "Connection failed: " . $e->getMessage();
-        header('Location: 500.html', true, 301);
     }
     
 ?>
@@ -185,7 +195,7 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Add users</h1>
+                        <h1 class="mt-4"><?php echo "$user_firstname $user_lastname"; ?></h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
                             <li class="breadcrumb-item active">Change Information</li>
@@ -204,10 +214,10 @@
                                         <div class="row">
                                             <form action="<?php $_SERVER['PHP_SELF'] ?>" enctype="multipart/form-data" method="POST">
                                                 <label for="userfirstname">First Name</label>
-                                                <input value="<?php if ($user_firstname!="") {echo $user_firstname;} ?>" required="true" type="text" id="userfirstname" name="userfirstname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <input readonly value="<?php if ($user_firstname!="") {echo $user_firstname;} ?>" type="text" id="userfirstname" name="userfirstname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                 
                                                 <label for="userlastname">Last Name</label>
-                                                <input value="<?php if ($user_lastname!="") {echo $user_lastname;} ?>" required="true" type="text" id="userlastname" name="userlastname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <input readonly value="<?php if ($user_lastname!="") {echo $user_lastname;} ?>" type="text" id="userlastname" name="userlastname" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                 
                                                 <label for="useremail">Email</label>
                                                 <input value="<?php if ($user_email!="") {echo $user_email;} ?>" type="text" id="useremail" name="useremail" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
@@ -216,7 +226,7 @@
                                                 <input value="<?php if ($user_phone_number!="") {echo $user_phone_number;} ?>" type="text" id="userphone" name="userphone" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <label for="userclass">Class</label>
-                                                <select id="userclass" name="userclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <select readonly id="userclass" name="userclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                     <option value="">Choose Class</option>
                                                     <?php
                                                         $stmt = $conn->prepare("SELECT * FROM Classes WHERE class_homeroom_teacher_id IS NOT NULL;");
@@ -224,33 +234,79 @@
                                                         $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                         foreach ($classes as $class) {
                                                             $class_name = $class['class_name'];
-                                                            echo "<option value='$class_name'>$class_name</option>";
+                                                            $allow_change_class = false;
+                                                            if ($position == 'Teacher') {
+                                                                $allow_change_class = true;
+                                                            }
+                                                            if ($class_name == $user_class) {
+                                                                if ($allow_change_class) {
+                                                                    echo "<option value='$class_name' selected>$class_name</option>";
+                                                                } else {
+                                                                    echo "<option value='$class_name' disabled selected>$class_name</option>";
+                                                                }
+                                                            } else {
+                                                                if ($allow_change_class) {
+                                                                    echo "<option value='$class_name' >$class_name</option>";
+                                                                } else {
+                                                                    echo "<option value='$class_name' disabled>$class_name</option>";
+                                                                }
+                                                            }
                                                         }
                                                     ?>
                                                 </select>
 
                                                 <label for="usergender">Gender</label>
-                                                <select required="true" id="usergender" name="usergender"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
-                                                    <option value="">Choose Gender</option>    
-                                                    <option value="male">Male</option>
-                                                    <option value="famale">Female</option>
+                                                <select id="usergender" name="usergender"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                    <option value="">Choose Gender</option>
+                                                    <?php
+                                                        if ($user_gender == "Male") {
+                                                            echo "<option value='Male' selected>Male</option>";
+                                                        }
+                                                        else {
+                                                            echo "<option value='Male' >Male</option>";
+                                                        }
+                                                        if ($user_gender == "Female") {
+                                                            echo "<option value='Female' selected>Female</option>";
+                                                        }
+                                                        else {
+                                                            echo "<option value='Female' >Female</option>";
+                                                        }
+                                                    ?>
                                                 </select>
                                                 
                                                 <label for="userdob">Date Of Birth</label>
-                                                <input type="date" id="userdob" name="userdob" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <input value="<?php if ($user_date_of_birth) { echo "$user_date_of_birth";} ?>" type="date" id="userdob" name="userdob" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
 
-                                                <label for="userphoto">user Photo</label>
-                                                <input required="true" type="file" id="userphoto" name="userphoto" accept=".jpg, .jpeg, .png" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
+                                                <?php
+                                                    if ($user_photo_path == "images/") {
+                                                        echo "<label for='userphoto'>User Photo (<b>Not Set</b>)</label>";
+                                                    } else {
+                                                        echo "<label for='userphoto'>New Photo</label>";
+                                                    }
+                                                ?>
+                                                <input type="file" id="userphoto" name="userphoto" accept=".jpg, .jpeg, .png" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <h4 style="margin-bottom: 15px;">Login Details</h4>
 
                                                 <label for="useraccount">Account</label>
-                                                <input value="<?php if ($user_account!="") {echo $user_account;} ?>" required="true" type="text" id="useraccount" name="useraccount" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
-
+                                                <input readonly value="<?php if ($user_account!="") {echo $user_account;} ?>" type="text" id="useraccount" name="useraccount" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
                                                 <label for="userpassword">Password</label>
-                                                <input required="true" type="password" id="userpassword" name="userpassword" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
-
-                                                <input type="submit" value="Add" name="submit" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                                <input type="password" id="userpassword" name="userpassword" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
+                                                <label for="userconfirmpassword">Confirm Password</label>
+                                                <input type="password" id="userconfirmpassword" name="userconfirmpassword" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                
+                                                <?php
+                                                    if ($allow_change) {
+                                                        echo "
+                                                        <input type='submit' value='Add' name='submit' style='background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;'>
+                                                        ";
+                                                    }
+                                                ?>
+                                                
                                             </form>
                                         </div>
                                     </div>

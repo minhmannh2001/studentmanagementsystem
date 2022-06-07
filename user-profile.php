@@ -21,7 +21,7 @@
         $password = md5($password);
 
         $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account OR user_email = :user_email");
-        if ($user_profile == '') {
+        if ($user_profile == "") {
             $stmt->bindParam(':user_account', $username);
             $stmt->bindParam(':user_email', $email);
         } else {
@@ -177,6 +177,7 @@
                                 ?>
                                 <form action="user-detail.php" method="POST">
                                     <input type="hidden" name="username" value="<?php echo "$username" ?>">
+                                    <input type="hidden" name="user_username" value="<?php echo "$user_account" ?>">
                                     <button type="submit" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</button>
                                 </form>
                                 <?php
