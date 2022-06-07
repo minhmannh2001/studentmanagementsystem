@@ -41,6 +41,8 @@
             $user_class = $result['user_class'];
             $user_gender = $result['user_gender'];
             $user_date_of_birth = $result['user_date_of_birth'];
+            $user_photo = $result['user_photo'];
+            $user_photo_url = 'images/' . $user_photo;
             $user_phone_number = $result['user_phone_number'];
             $user_position = $result['user_position'];
             $user_email = $result['user_email'];
@@ -88,10 +90,18 @@
                             <div class="col-md-12 grid-margin">
                                 <div class="card" style="margin-bottom: 30px;">
                                     <div class="card-body d-flex">
-                                        <img src="https://dummyimage.com/300x400/343a40/6c757d" alt="">
+                                        <!-- <img src="https://dummyimage.com/300x400/343a40/6c757d" alt="" height="400px" width="300px"> -->
+                                        <?php
+                                            if ($user_photo_url == "images/") {
+                                                echo "<img src='https://dummyimage.com/300x400/343a40/6c757d' alt='' height='400px' width='300px'>";
+                                            } else {
+                                                echo "<div style='background-image: url(" . "$user_photo_url" . "); width: 300px; height: 400px; background-size: cover;'></div>";
+                                            }
+                                        ?>
+                                        <!-- <div style="background-image: url('<?php echo "$user_photo_url" ?>'); width: 300px; height: 400px; background-size: cover;"></div> -->
                                         <div class="d-flex flex-column" style="margin-left: 50px;">
                                             <div class="d-flex flex-column" style="background-color: #15395a; padding: 20px 30px; border-radius: 5px; margin-bottom: 20px;">
-                                                <h3 style="color: white;"><?php echo "$user_firstname" . " " . "$user_lastname" ?></h3>
+                                                <h3 style="color: white;"><?php echo "$user_firstname" . " " . "$user_lastname"; ?></h3>
                                                 <strong style="color: #ceaa4d;"><?php echo "$user_position" ?></strong>
                                             </div>
                                             <div>
@@ -135,7 +145,10 @@
                                                 <div class="d-flex">
                                                     <b>Date Of Birth:&nbsp</b>
                                                     <p>
-                                                        <?php if ($user_date_of_birth != '') {
+                                                        <?php 
+                                                        if ($user_date_of_birth != '') {
+                                                            $user_date_of_birth = date_create($user_date_of_birth);
+                                                            $user_date_of_birth = date_format($user_date_of_birth, "d/m/Y");
                                                             echo "$user_date_of_birth";
                                                         } else {
                                                             echo 'Not Set';
@@ -162,7 +175,10 @@
                                         echo "<p style='color: red;'>$warning</p>";
                                     }
                                 ?>
-                                <a href="user-detail.php" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</a>
+                                <form action="user-detail.php" method="POST">
+                                    <input type="hidden" name="username" value="<?php echo "$username" ?>">
+                                    <button type="submit" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</button>
+                                </form>
                                 <?php
                                     if ($user_profile != "") {
                                         echo '<form action="">

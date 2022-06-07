@@ -21,7 +21,8 @@
         session_start();
         $_SESSION['just-delete'] = 'true';
         // echo "Record deleted successfully";
-        header('Location: manage-teachers.php', true, 301);
+        // header('Location: manage-teachers.php', true, 301);
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
 
     } catch(PDOException $e) {
         // echo $sql . "<br>" . $e->getMessage();

@@ -239,20 +239,36 @@
                                                     <td>$teacher_class</td>
                                                     <td>$teacher_email</td>
                                                     <td>$teacher_start_date</td>
-                                                    <td class='d-flex'>
-                                                        <form action='user-profile.php' method='GET'>
-                                                            <input type='hidden' value='$teacher_username' name='username'>
-                                                            <button class='link-button' type='submit'>More</button>
-                                                        </form>
-                                                        &nbsp
-                                                        |
-                                                        &nbsp
-                                                        <form action='delete-user.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
-                                                            <input type='hidden' value='$teacher_username' name='username'>
-                                                            <button class='link-button' type='submit'>Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>";
+                                                ";
+                                                if ($teacher_username == $username) {
+                                                    echo "
+                                                        <td class='d-flex'>
+                                                            <a href='user-profile.php'>More</a>
+                                                            &nbsp
+                                                            |
+                                                            &nbsp
+                                                            Delete
+                                                        </td>
+                                                    </tr>
+                                                    ";
+                                                } else {
+                                                    echo "  
+                                                            <td class='d-flex'>
+                                                            <form action='user-profile.php' method='GET'>
+                                                                <input type='hidden' value='$teacher_username' name='username'>
+                                                                <button class='link-button' type='submit'>More</button>
+                                                            </form>
+                                                            &nbsp
+                                                            |
+                                                            &nbsp
+                                                            <form action='delete-user.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
+                                                                <input type='hidden' value='$teacher_username' name='username'>
+                                                                <button class='link-button' type='submit'>Delete</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>";
+
+                                                }
                                                 $count += 1;
                                             }
                                         ?>
