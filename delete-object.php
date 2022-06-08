@@ -5,23 +5,30 @@
     $db_name = "test";
 
     $username = $_POST['username'];
+    $delete_object = $_POST['deleteobject'];
 
-    echo $username;
+    // echo $delete_object;
 
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-        // sql to delete a record
-        $sql = "DELETE FROM Users WHERE user_account='$username'";
-
-        // use exec() because no results are returned
-        $conn->exec($sql);
+        if ($delete_object == "") {
+            // sql to delete a record
+            $sql = "DELETE FROM Users WHERE user_account='$username'";
+    
+            // use exec() because no results are returned
+            $conn->exec($sql);
+        } else if ($delete_object == "class") {
+            $class_name = $_POST["classname"];
+            echo "$class_name";
+            $sql = "DELETE FROM Classes WHERE class_name='$class_name'";
+            $conn->exec($sql);
+        }
         session_start();
         $_SESSION['just-delete'] = 'true';
         // echo "Record deleted successfully";
-        // header('Location: manage-teachers.php', true, 301);
         header('Location: ' . $_SERVER['HTTP_REFERER']);
 
     } catch(PDOException $e) {

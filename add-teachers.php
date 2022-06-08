@@ -172,11 +172,6 @@
                                     <p style='color: red;'>$error</p>
                                 ";
                             }
-                            if ($add_item_success != "") {
-                                echo "
-                                    <p style='color: red;'>$add_item_success</p>
-                                ";
-                            }
                         ?>
                         <div class="row">
                             <div class="col-md-12 grid-margin">

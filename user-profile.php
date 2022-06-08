@@ -175,11 +175,18 @@
                                         echo "<p style='color: red;'>$warning</p>";
                                     }
                                 ?>
-                                <form action="user-detail.php" method="POST">
-                                    <input type="hidden" name="username" value="<?php echo "$username" ?>">
-                                    <input type="hidden" name="user_username" value="<?php echo "$user_account" ?>">
-                                    <button type="submit" style="text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">Change Information</button>
-                                </form>
+                                <?php
+                                    if ($position == "Teacher" or $user_profile == "") {
+                                        echo "
+                                            <form action='user-detail.php' method='POST'>
+                                                <input type='hidden' name='username' value='$username'>
+                                                <input type='hidden' name='user_username' value='$user_account'>
+                                                <button type='submit' style='text-decoration: none; background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;'>Change Information</button>
+                                            </form> 
+                                        ";
+                                    }
+                                
+                                ?>
                                 <?php
                                     if ($user_profile != "") {
                                         echo '<form action="">

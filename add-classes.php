@@ -1,3 +1,27 @@
+<?php
+    $error = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+    
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -34,6 +58,7 @@
 
                                                 <label for="homeroomteacher">Homeroom Teacher</label>
                                                 <select required="true" id="homeroomteacher" name="homeroomteacher"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                    <option selected value="">Choose Teacher</option>
                                                     <option value="1">Tiger Nixon</option>
                                                     <option value="2">Garrett Winters</option>
                                                 </select>

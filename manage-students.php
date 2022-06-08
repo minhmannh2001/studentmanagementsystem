@@ -152,7 +152,7 @@
     <body class="sb-nav-fixed">
         <div id="id01" class="modal-confirm">
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
-            <form class="modal-content" action="delete-user.php" method="POST">
+            <form class="modal-content" action="delete-object.php" method="POST">
                 <div class="container-modal">
                 <h1>Delete User</h1>
                 <p>Are you sure you want to delete this user?</p>
@@ -245,7 +245,7 @@
                                                             &nbsp
                                                             |
                                                             &nbsp
-                                                            Delete
+                                                            <a disabled>Delete</a>
                                                         </td>
                                                     </tr>
                                                     ";
@@ -259,7 +259,7 @@
                                                             &nbsp
                                                             |
                                                             &nbsp
-                                                            <form action='delete-user.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
+                                                            <form action='delete-object.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
                                                                 <input type='hidden' value='$student_username' name='username'>
                                                                 <button class='link-button' type='submit'>Delete</button>
                                                             </form>

@@ -14,9 +14,20 @@
     $db_name = "test";
 
     $user_detail = $_POST['user_username'];
+    if ($user_detail != "") {
+        $_SESSION['current_user_detail'] = $user_detail;
+    }
     if ($user_detail == "") {
         $user_detail = $_POST['useraccount'];
+            if ($user_detail != "") {
+                $_SESSION['current_user_detail'] = $user_detail;
+            }
     }
+
+    if ($user_detail == "") {
+        $user_detail = $_SESSION['current_user_detail'];
+    }
+
     $current_username = $_POST['username'];
     if ($current_username == "") {
         $current_username = $username;
@@ -52,6 +63,7 @@
         $user_email = $result['user_email'];
         $user_gender = $result['user_gender'];
         $user_password = $result['user_password'];
+        $user_position = $result['user_position'];
         $user_date_of_birth = $result['user_date_of_birth'];
         if ($user_date_of_birth != "") {
             $user_date_of_birth = date_create($user_date_of_birth);
@@ -161,6 +173,20 @@
                     $stmt->bindParam(':user_account', $user_detail);
                     $stmt->execute();
                 }
+
+                $old_classname = $_SESSION['old-classname'];
+                
+                if ($user_class != "" and $user_class != $old_classname) {
+                    $stmt = $conn->prepare("UPDATE Classes SET class_homeroom_teacher_id=NULL WHERE class_name=:class_name;");
+                    $stmt->bindParam(':class_name', $old_classname);
+                    $stmt->execute();
+
+                    $stmt = $conn->prepare("UPDATE Classes SET class_homeroom_teacher_id=:class_homeroom_teacher_id WHERE class_name=:class_name;");
+                    $stmt->bindParam(':class_homeroom_teacher_id', $user_id);
+                    $stmt->bindParam(':class_name', $user_class);
+                    $stmt->execute();
+                }
+
                 $_SESSION['change-information'] = "true";
             }
         }
@@ -183,7 +209,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - user Management System</title>
+        <title>Dashboard - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
@@ -229,7 +255,12 @@
                                                 <select readonly id="userclass" name="userclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                     <option value="">Choose Class</option>
                                                     <?php
-                                                        $stmt = $conn->prepare("SELECT * FROM Classes WHERE class_homeroom_teacher_id IS NOT NULL;");
+                                                        if ($user_position == "Student") {
+                                                            $stmt = $conn->prepare("SELECT * FROM Classes WHERE class_homeroom_teacher_id IS NOT NULL;");
+                                                        } else {
+                                                            $stmt = $conn->prepare("SELECT * FROM Classes WHERE class_homeroom_teacher_id IS NULL OR class_homeroom_teacher_id=:class_homeroom_teacher_id;");
+                                                            $stmt->bindParam(':class_homeroom_teacher_id', $user_id);
+                                                        }
                                                         $stmt->execute();
                                                         $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                                         foreach ($classes as $class) {
@@ -240,6 +271,7 @@
                                                             }
                                                             if ($class_name == $user_class) {
                                                                 if ($allow_change_class) {
+                                                                    $_SESSION['old-classname'] = $class_name;
                                                                     echo "<option value='$class_name' selected>$class_name</option>";
                                                                 } else {
                                                                     echo "<option value='$class_name' disabled selected>$class_name</option>";
@@ -280,7 +312,7 @@
 
                                                 
                                                 <?php
-                                                    if ($user_photo_path == "images/") {
+                                                    if ($user_photo_path == "images/" and $change_information == "false") {
                                                         echo "<label for='userphoto'>User Photo (<b>Not Set</b>)</label>";
                                                     } else {
                                                         echo "<label for='userphoto'>New Photo</label>";
@@ -302,7 +334,7 @@
                                                 <?php
                                                     if ($allow_change) {
                                                         echo "
-                                                        <input type='submit' value='Add' name='submit' style='background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;'>
+                                                        <input type='submit' value='Update' name='submit' style='background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;'>
                                                         ";
                                                     }
                                                 ?>
