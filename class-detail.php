@@ -13,6 +13,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($position == "Student") {
+        header('Location: 401.html', true, 301);
+    }
+    
     if (isset($_POST['changeclass'])) {
         try {
 
@@ -31,7 +35,9 @@
             $result = $stmt->fetchAll();
 
             if (count($result) > 0) {
-                $error = "Class already exists.";
+                if ($form_class_name != $_SESSION['current_class_detail']) {
+                    $error = "This class name has been used.";
+                }
             }
 
             if ($error == "") {
@@ -120,7 +126,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - Student Management System</title>
+        <title>Class Detail - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
@@ -185,6 +191,21 @@
                                                         // set the PDO error mode to exception
                                                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
+                                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher' AND user_class IS NOT NULL;");
+                                                        $stmt->execute();
+                                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        foreach ($results as $result) {
+                                                            $result_id = $result['user_id'];
+                                                            $result_firstname = $result['user_firstname'];
+                                                            $result_lastname = $result['user_lastname'];
+                                                            $result_name = $result_firstname . " " . $result_lastname;
+                                                            $result_class = $result['user_class'];
+                                                            
+                                                            if ($result_class == "") {
+                                                                echo "<option value='$result_id'>$result_name</option>";
+                                                            }
+                                                        }
+
                                                         $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher' AND user_class IS NULL;");
                                                         $stmt->execute();
                                                         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -193,7 +214,7 @@
                                                             $result_firstname = $result['user_firstname'];
                                                             $result_lastname = $result['user_lastname'];
                                                             $result_name = $result_firstname . " " . $result_lastname;
-
+                                                            
                                                             echo "<option value='$result_id'>$result_name</option>";
                                                         }
                                                     ?>

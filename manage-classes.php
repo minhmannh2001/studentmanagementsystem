@@ -17,6 +17,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($position == "Student") {
+        header('Location: 401.html', true, 301);
+    }
+
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
@@ -208,11 +212,11 @@
                                     </tfoot>
                                     <tbody>
                                         <?php
-                                            echo "$username";
+                                            // echo "$username";
                                             $count = 1;
                                             $stmt = $conn->prepare("SELECT * FROM Classes;");
                                             $stmt->execute();
-                                            $classess = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                            $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
                                             foreach ($classes as $class) {
                                                 $class_id = $class['class_id'];
                                                 $class_name = $class['class_name'];

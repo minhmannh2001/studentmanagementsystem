@@ -22,8 +22,13 @@
             $conn->exec($sql);
         } else if ($delete_object == "class") {
             $class_name = $_POST["classname"];
-            echo "$class_name";
+            // echo "$class_name";
             $sql = "DELETE FROM Classes WHERE class_name='$class_name'";
+            $conn->exec($sql);
+        } else if ($delete_object == "exam") {
+            $exam_id = $_POST["examid"];
+            // echo "$exam_id";
+            $sql = "DELETE FROM Exams WHERE exam_id='$exam_id'";
             $conn->exec($sql);
         }
         session_start();

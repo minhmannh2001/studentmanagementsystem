@@ -84,7 +84,7 @@
             $user_email = $_POST['useremail'];
             $user_phone_number = $_POST['userphone'];
             $allow_change_class = false;
-            if ($position == 'Teacher') {
+            if ($position == 'Teacher' or $user_detail == $username) {
                 $allow_change_class = true;
             }
             if ($allow_change_class) {
@@ -209,7 +209,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - Student Management System</title>
+        <title>User Detail - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
@@ -224,6 +224,14 @@
                         <h1 class="mt-4"><?php echo "$user_firstname $user_lastname"; ?></h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
+                            <?php 
+                                if ($user_position == "Teacher") {
+                                    echo "<li class='breadcrumb-item'><a href='manage-teachers.php'>Manage Teachers</a></li>";
+                                } else {
+                                    echo "<li class='breadcrumb-item'><a href='manage-students.php'>Manage Students</a></li>";
+                                }
+                            ?>
+                            
                             <li class="breadcrumb-item active">Change Information</li>
                         </ol>
                         <?php
@@ -252,7 +260,13 @@
                                                 <input value="<?php if ($user_phone_number!="") {echo $user_phone_number;} ?>" type="text" id="userphone" name="userphone" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <label for="userclass">Class</label>
-                                                <select readonly id="userclass" name="userclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <?php 
+                                                    $allow_change_class = false;
+                                                    if ($position == 'Teacher' or $user_detail == $username) {
+                                                        $allow_change_class = true;
+                                                    }
+                                                ?>
+                                                <select <?php if (!$allow_change_class) { echo 'readonly'; } ?> id="userclass" name="userclass"  style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
                                                     <option value="">Choose Class</option>
                                                     <?php
                                                         if ($user_position == "Student") {
@@ -266,7 +280,7 @@
                                                         foreach ($classes as $class) {
                                                             $class_name = $class['class_name'];
                                                             $allow_change_class = false;
-                                                            if ($position == 'Teacher') {
+                                                            if ($position == 'Teacher' or $user_detail == $username) {
                                                                 $allow_change_class = true;
                                                             }
                                                             if ($class_name == $user_class) {

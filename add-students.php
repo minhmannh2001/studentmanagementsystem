@@ -13,6 +13,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($position == "Student") {
+        header('Location: 401.html', true, 301);
+    }
+    
     if (isset($_POST['submit'])) {
         $student_firstname = $_POST['studentfirstname'];
         $student_lastname = $_POST['studentlastname'];
@@ -137,7 +141,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - Student Management System</title>
+        <title>Add Students - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
@@ -152,6 +156,7 @@
                         <h1 class="mt-4">Add Students</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="manage-students.php">Manage Students</a></li>
                             <li class="breadcrumb-item active">Add Students</li>
                         </ol>
                         <?php

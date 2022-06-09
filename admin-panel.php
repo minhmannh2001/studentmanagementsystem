@@ -1,3 +1,29 @@
+<?php
+    $error = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+    
+    $_SESSION['add-item-success'] = "false";
+
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+    
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        echo "Connection failed: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -38,29 +64,72 @@
                                             <div class="col-md -6 col-xl report-inner-card d-flex justify-content-between" style="border-right: 1px solid #dfdfdf;">
                                                 <div class="inner-card-text">
                                                     <span class="report-title">Total Class</span>
-                                                    <h4>2</h4>
-                                                    <a href="manage-classes.php"><span class="report-count"> View Classes</span></a>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Classes;");
+                                                        $stmt->execute();
+                                                        $classes = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $nb_classes = count($classes);
+                                                        echo "<h4>$nb_classes</h4>";
+                                                        if ($position == "Teacher") {
+                                                            echo "<a href='manage-classes.php'><span class='report-count'> View Classes</span></a>";
+                                                        }
+                                                    ?>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-xl report-inner-card d-flex justify-content-between" style="border-right: 1px solid #dfdfdf;">
                                                 <div class="inner-card-text">
                                                     <span class="report-title">Total Students</span>
-                                                    <h4>4</h4>
-                                                    <a href="manage-students.php"><span class="report-count"> View Students</span></a>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Student';");
+                                                        $stmt->execute();
+                                                        $students = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $nb_students = count($students);
+                                                        echo "<h4>$nb_students</h4>";
+                                                        if ($position == "Teacher") {
+                                                            echo "<a href='manage-students.php'><span class='report-count'> View Students</span></a>";
+                                                        }
+                                                    ?>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6 col-xl report-inner-card d-flex justify-content-between" style="border-right: 1px solid #dfdfdf;">
+                                                <div class="inner-card-text">
+                                                    <span class="report-title">Total Teachers</span>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position = 'Teacher';");
+                                                        $stmt->execute();
+                                                        $teachers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $nb_teachers = count($teachers);
+                                                        echo "<h4>$nb_teachers</h4>";
+                                                        if ($position == "Teacher") {
+                                                            echo "<a href='manage-teachers.php'><span class='report-count'> View Teachers</span></a>";
+                                                        }
+                                                    ?>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-xl report-inner-card" style="border-right: 1px solid #dfdfdf;">
                                                 <div class="inner-card-text">
                                                     <span class="report-title">Total Class Exams</span>
-                                                    <h4>0</h4>
-                                                    <a href="manage-notice.php"><span class="report-count"> View Class Exams</span></a>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Exams;");
+                                                        $stmt->execute();
+                                                        $exams = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $nb_exams = count($exams);
+                                                        echo "<h4>$nb_exams</h4>";
+                                                    ?>
+                                                    <a href="manage-exams.php"><span class="report-count"> View Class Exams</span></a>
                                                 </div>
                                             </div>
                                             <div class="col-md-6 col-xl report-inner-card">
                                                 <div class="inner-card-text">
                                                     <span class="report-title">Total Challenges</span>
-                                                    <h4>0</h4>
-                                                    <a href="manage-public-notice.php"><span class="report-count"> View Challenges</span></a>
+                                                    <?php
+                                                        $stmt = $conn->prepare("SELECT * FROM Challenges;");
+                                                        $stmt->execute();
+                                                        $challenges = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                                        $nb_challenges = count($challenges);
+                                                        echo "<h4>$nb_challenges</h4>";
+                                                    ?>
+                                                    <a href="manage-challenges.php"><span class="report-count"> View Challenges</span></a>
                                                 </div>
                                             </div>
                                         </div>

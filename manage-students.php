@@ -17,6 +17,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($position == "Student") {
+        header('Location: 401.html', true, 301);
+    }
+    
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
@@ -221,6 +225,7 @@
                                                 $student_id = $student['user_id'];
                                                 $student_name = $student['user_firstname'] . ' ' . $student['user_lastname'];
                                                 $student_username = $student['user_account'];
+                                                $student_class = $student['user_class'];
                                                 if ($student['user_class'] == '') {
                                                     $student_class = 'Not Set';
                                                 }
@@ -276,6 +281,7 @@
                         </div>
                     </div>
                 </main>
+                <div id="snackbar">Delete successfully.</div>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
                         <div class="d-flex align-items-center justify-content-between small">
