@@ -17,9 +17,9 @@
     $db_password = "";
     $db_name = "test";
 
-    if ($position == "Student") {
-        header('Location: 401.html', true, 301);
-    }
+    // if ($position == "Student") {
+    //     header('Location: 401.html', true, 301);
+    // }
 
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
@@ -40,7 +40,14 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Manage Exams - Student Management System</title>
+        <?php
+            if ($position == "Teacher") {
+                echo "<title>Manage Exams - Student Management System</title>";
+            } else {
+                echo "<title>Exam List - Student Management System</title>";
+            }
+        ?>
+        
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <link rel="stylesheet" href="https://cdn.datatables.net/1.12.1/css/jquery.dataTables.min.css">
@@ -157,8 +164,8 @@
             <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
             <form class="modal-content" action="delete-object.php" method="POST">
                 <div class="container-modal">
-                <h1>Delete User</h1>
-                <p>Are you sure you want to delete this user?</p>
+                <h1>Delete Exam</h1>
+                <p>Are you sure you want to delete this exam?</p>
                 <!-- <input type='hidden' value='<?php $delete_username ?>' name='username'> -->
                 <div class="clearfix">
                     <button type="button" onclick="modal_cancel_btn()" class="cancelbtn btn-modal">Cancel</button>
@@ -173,12 +180,33 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Manage Exams</h1>
-                        <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Manage Exams</li>
-                        </ol>
-                        <a href="add-exams.php" style="background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;">Add new</a>
+                        <?php
+                            if ($position == 'Teacher') {
+                                echo "
+                                    <h1 class='mt-4'>Manage Exams</h1>
+                                    <ol class='breadcrumb mb-4'>
+                                        <li class='breadcrumb-item'><a href='admin-panel.php'>Dashboard</a></li>
+                                        <li class='breadcrumb-item active'>Manage Exams</li>
+                                    </ol>
+                                ";
+                            } else {
+                                echo "
+                                    <h1 class='mt-4'>Exam List</h1>
+                                    <ol class='breadcrumb mb-4'>
+                                        <li class='breadcrumb-item'><a href='admin-panel.php'>Dashboard</a></li>
+                                        <li class='breadcrumb-item active'>Exam List</li>
+                                    </ol>
+                                ";
+                            }
+                        ?>
+                        
+                        <?php
+                            if ($position == 'Teacher') {
+                                echo "
+                                <a href='add-exams.php' style='background-color: #0d6efd; color: white; padding: 12px 20px; border: none; border-radius: 4px; cursor: pointer; text-decoration: none;'>Add new</a>                   
+                                ";
+                            }
+                        ?>
                         <?php
                             $stmt = $conn->prepare("SELECT * FROM Exams;");
                             $stmt->execute();
@@ -189,7 +217,7 @@
                         <div class="card mb-4">
                             <div class="card-header">
                                 <i class="fas fa-table me-1"></i>
-                                Class List
+                                Exam List
                             </div>
                             <div class="card-body">
                                 <table id="datatablesSimple"  class="hover stripe row-border" style="width:100%">
@@ -237,35 +265,59 @@
                                                 $table_exam_expiration_date = $exam['exam_expiration_date'];
                                                 $table_exam_expiration_date = date_create($table_exam_expiration_date);
                                                 $table_exam_expiration_date = date_format($table_exam_expiration_date, "H:i d/m/Y");
+                                                
+                                                if ($position == 'Teacher') {
+                                                    echo "
+                                                    <tr>
+                                                        <td>$count</td>
+                                                        <td>$table_exam_title</td>
+                                                        <td>$table_exam_class</td>
+                                                        <td class='d-flex justify-content-between'>
+                                                            <p style='margin-bottom: 0px;'>$table_exam_subject</p>
+                                                            <a href='download.php?path=exams/$table_exam_subject'>Download</a>
+                                                        </td>
+                                                        <td>$table_exam_creator_name</td>
+                                                        <td>$table_exam_creation_date</td>
+                                                        <td>$table_exam_expiration_date</td>
                                         
-                                                echo "
-                                                <tr>
-                                                    <td>$count</td>
-                                                    <td>$table_exam_title</td>
-                                                    <td>$table_exam_class</td>
-                                                    <td class='d-flex justify-content-between'>
-                                                        <p style='margin-bottom: 0px;'>$table_exam_subject</p>
-                                                        <a href='download.php?path=exams/$table_exam_subject'>Download</a>
-                                                    </td>
-                                                    <td>$table_exam_creator_name</td>
-                                                    <td>$table_exam_creation_date</td>
-                                                    <td>$table_exam_expiration_date</td>
-                                    
-                                                    <td class='d-flex'>
-                                                        <form action='exam-detail.php' method='GET'>
-                                                            <input type='hidden' value='$table_exam_id' name='examid'>
-                                                            <button class='link-button' type='submit'>More</button>
-                                                        </form>
-                                                        &nbsp
-                                                        |
-                                                        &nbsp
-                                                        <form action='delete-object.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
-                                                            <input type='hidden' value='$table_exam_id' name='examid'>
-                                                            <input type='hidden' value='exam' name='deleteobject'>
-                                                            <button class='link-button' type='submit'>Delete</button>
-                                                        </form>
-                                                    </td>
-                                                </tr>";
+                                                        <td class='d-flex'>
+                                                            <form action='exam-detail.php' method='GET'>
+                                                                <input type='hidden' value='$table_exam_id' name='examid'>
+                                                                <button class='link-button' type='submit'>More</button>
+                                                            </form>
+                                                            &nbsp
+                                                            |
+                                                            &nbsp
+                                                            <form action='delete-object.php' id='delete-form$count' onsubmit='event.preventDefault(); modal_confirm_appear($count);' method='POST'>
+                                                                <input type='hidden' value='$table_exam_id' name='examid'>
+                                                                <input type='hidden' value='exam' name='deleteobject'>
+                                                                <button class='link-button' type='submit'>Delete</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>";
+                                                } else {
+                                                    echo "
+                                                    <tr>
+                                                        <td>$count</td>
+                                                        <td>$table_exam_title</td>
+                                                        <td>$table_exam_class</td>
+                                                        <td class='d-flex justify-content-between'>
+                                                            <p style='margin-bottom: 0px;'>$table_exam_subject</p>
+                                                            <a href='download.php?path=exams/$table_exam_subject'>Download</a>
+                                                        </td>
+                                                        <td>$table_exam_creator_name</td>
+                                                        <td>$table_exam_creation_date</td>
+                                                        <td>$table_exam_expiration_date</td>
+                                        
+                                                        <td class='d-flex'>
+                                                            <form action='exam-detail.php' method='GET'>
+                                                                <input type='hidden' value='$table_exam_id' name='examid'>
+                                                                <button class='link-button' type='submit'>More</button>
+                                                            </form>
+                                                            &nbsp
+                                                        </td>
+                                                    </tr>";
+                                                }
 
                                                 
                                                 $count += 1;

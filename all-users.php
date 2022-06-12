@@ -243,7 +243,7 @@
                                                     <td>$teacher_email</td>
                                                     <td>$teacher_start_date</td>
                                                 ";
-                                                if ($teacher_username == $username) {
+                                                if ($teacher_username == $username and $position == "Teacher") {
                                                     echo "
                                                         <td class='d-flex'>
                                                             <a href='user-profile.php'>More</a>
@@ -254,7 +254,7 @@
                                                         </td>
                                                     </tr>
                                                     ";
-                                                } else {
+                                                } else if ($position == "Teacher") {
                                                     echo "  
                                                             <td class='d-flex'>
                                                             <form action='user-profile.php' method='GET'>
@@ -271,6 +271,15 @@
                                                         </td>
                                                     </tr>";
 
+                                                } else {
+                                                    echo "  
+                                                            <td class='d-flex'>
+                                                            <form action='user-profile.php' method='GET'>
+                                                                <input type='hidden' value='$teacher_username' name='username'>
+                                                                <button class='link-button' type='submit'>More</button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>";
                                                 }
                                                 $count += 1;
                                             }

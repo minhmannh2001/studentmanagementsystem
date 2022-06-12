@@ -30,6 +30,11 @@
             // echo "$exam_id";
             $sql = "DELETE FROM Exams WHERE exam_id='$exam_id'";
             $conn->exec($sql);
+        } else if ($delete_object == "challenge") {
+            $challenge_id = $_POST["challengeid"];
+            // echo "$challenge_id";
+            $sql = "DELETE FROM Challenges WHERE challenge_id='$challenge_id'";
+            $conn->exec($sql);
         }
         session_start();
         $_SESSION['just-delete'] = 'true';

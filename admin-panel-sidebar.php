@@ -31,29 +31,46 @@
                                 </nav>
                             </div>
 
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-student" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Students
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts-student" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="add-students.php">Add Students</a>
-                                    <a class="nav-link" href="manage-students.php">Manage Students</a>
-                                </nav>
-                            </div>
+                            <?php
+                                if ($position == "Teacher") {
+                                    echo "
+                                        <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-student' aria-expanded='false' aria-controls='collapseLayouts'>
+                                        <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
+                                        Students
+                                        <div class='sb-sidenav-collapse-arrow'><i class='fas fa-angle-down'></i></div>
+                                        </a>
+                                        <div class='collapse' id='collapseLayouts-student' aria-labelledby='headingOne' data-bs-parent='#sidenavAccordion'>
+                                            <nav class='sb-sidenav-menu-nested nav'>
+                                                <a class='nav-link' href='add-students.php'>Add Students</a>
+                                                <a class='nav-link' href='manage-students.php'>Manage Students</a>
+                                            </nav>
+                                        </div>
 
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-exam" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Exams
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts-exam" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="add-exams.php">Add Exams</a>
-                                    <a class="nav-link" href="manage-exams.php">Manage Exams</a>
-                                </nav>
-                            </div>
+                                        <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-exam' aria-expanded='false' aria-controls='collapseLayouts'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
+                                            Exams
+                                            <div class='sb-sidenav-collapse-arrow'><i class='fas fa-angle-down'></i></div>
+                                        </a>
+                                        <div class='collapse' id='collapseLayouts-exam' aria-labelledby='headingOne' data-bs-parent='#sidenavAccordion'>
+                                            <nav class='sb-sidenav-menu-nested nav'>
+                                                <a class='nav-link' href='add-exams.php'>Add Exams</a>
+                                                <a class='nav-link' href='manage-exams.php'>Manage Exams</a>
+                                            </nav>
+                                        </div>
+                                    ";
+                                } else {
+                                    echo "
+                                        <a class='nav-link' href='manage-exams.php'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-tachometer-alt'></i></div>
+                                            Exam List
+                                        </a>
+                                
+                                    ";
+                                }
+                            ?>
+                            
+
+                            
 
                             <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-challenge" aria-expanded="false" aria-controls="collapseLayouts">
                                 <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
