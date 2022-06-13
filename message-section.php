@@ -22,8 +22,6 @@
         header('Location: 500.html', true, 301);
     }
 
-
-
 ?>
 
 <!DOCTYPE html>
@@ -66,156 +64,80 @@
                         <div class="row">
                             <div class="col-md-12 grid-margin">
                                 <div class="d-flex align-items-center">
-                                    <span style="height: 15px; width: 15px; background-color: #f4ba60; border-radius: 50%; display: inline-block;"></span>&nbsp<p style="margin-bottom: 0;">Waiting messages: 2</p>                             
+                                    <?php
+                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account;");
+                                        $stmt->bindParam(':user_account', $username);
+                                        $stmt->execute();
+                                        $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                        $current_user_id = $result['user_id'];
+
+                                        $stmt = $conn->prepare("SELECT DISTINCT contact_owner_id, contact_guest_id, contact_status FROM Contacts WHERE contact_guest_id=:contact_guest_id");
+                                        $stmt->bindParam(':contact_guest_id', $current_user_id);
+                                        $stmt->execute();
+                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                        $total_no_waiting_message = count($results);
+
+                                    ?>
+                                    <span style="height: 15px; width: 15px; background-color: #f4ba60; border-radius: 50%; display: inline-block;"></span>&nbsp<p style="margin-bottom: 0;">Waiting messages: <?php echo "$total_no_waiting_message"; ?></p>                             
                                 </div>
-                                <div>
+                                <!-- <div>
                                     <form action="">
                                         <input placeholder="Search contacts..." type="text" id="searchcontact" name="searchcontact" style="width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">            
                                     </form>
-                                </div>
+                                </div> -->
                             </div>
-                            <h4 style="margin-bottom: 0px;">Users List</h4>
+                            <h4 style="margin-bottom: 0px; margin-top: 15px;">Contact List</h4>
                             <div class="row" style="margin-top: 15px;">
                                 <div class="col-md-12 grid-margin">
                                     <div class="card">
                                         <div class="card-body">
                                             <div>
-                                                <a href="messenger.php" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Miro Badev</strong></p>
-                                                            <p class="email">mirobadev@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOnline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/2_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Martin Joseph</strong></p>
-                                                            <p class="email">marjoseph@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #f4ba60; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspWating</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/3_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Tomas Kennedy</strong></p>
-                                                            <p class="email">tomaskennedy@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOnline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/4_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Enrique	Sutton</strong></p>
-                                                            <p class="email">enriquesutton@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOnline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Miro Badev</strong></p>
-                                                            <p class="email">mirobadev@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOnline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/2_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Martin Joseph</strong></p>
-                                                            <p class="email">marjoseph@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #eaeef0; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOffline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/3_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Tomas Kennedy</strong></p>
-                                                            <p class="email">tomaskennedy@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #eaeef0; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOffline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/4_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Enrique	Sutton</strong></p>
-                                                            <p class="email">enriquesutton@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #eaeef0; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOffline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/3_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Tomas Kennedy</strong></p>
-                                                            <p class="email">tomaskennedy@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #eaeef0; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOffline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                                <a href="" style="text-decoration: none; color: inherit;">
-                                                    <div class="d-flex friend" style="border-bottom:1px solid #e7ebee;">
-                                                        <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/4_copy.jpg" class="user-image">
-                                                        <div class="d-flex flex-column justify-content-center">
-                                                            <p class="username" style="margin-bottom: 5px;"><strong>Enrique	Sutton</strong></p>
-                                                            <p class="email">enriquesutton@gmail.com</p>
-                                                            <div class="d-flex align-items-center">
-                                                                    <span style="height: 10px; width: 10px; background-color: #eaeef0; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;">
-                                                                    <p style="width: 100px; margin-bottom: 0; margin-top: -6px;">&nbsp&nbsp&nbsp&nbspOffline</p>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </a>
+                                                <?php
+                                                    foreach ($results as $result) {
+                                                        $contact_user_id = $result['contact_owner_id'];
+                                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
+                                                        $stmt->bindParam(':user_id', $contact_user_id);
+                                                        $stmt->execute();
+                                                        $contact_user_information = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                        $contact_user_email = $contact_user_information['user_email'];
+                                                        $contact_user_name = $contact_user_information['user_firstname'] . " " . $contact_user_information['user_lastname'];
+                                                        $contact_user_photo = $contact_user_information['user_photo'];
+                                                        $contact_user_photo_url = 'images/' . $contact_user_photo;
+                                                        echo "
+                                                            <a href='messenger.php' style='text-decoration: none; color: inherit;'>
+                                                                <div class='d-flex friend' style='border-bottom:1px solid #e7ebee;'>
+                                                            ";
+                                                            if ($contact_user_photo_url == "images/") {
+                                                                echo "<img src='https://dummyimage.com/200x200/343a40/6c757d' alt='' class='user-image'>";
+                                                            }
+                                                            else {
+                                                                echo "<div style='background-image: url(" . "$contact_user_photo_url" . "); width: 100px; height: 100px; background-size: cover;' class='user-image'></div>";
+                                                            }
+                                                            // <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg' class='user-image'>
+                                                        echo "
+                                                                    <div class='d-flex flex-column justify-content-center'>
+                                                                        <p class='username' style='margin-bottom: 5px;'><strong>$contact_user_name</strong></p>
+                                                                        <p class='email'>$contact_user_email</p>
+                                                        ";
+                                                        echo "
+                                                                        <div class='d-flex align-items-center'>
+                                                                                <span style='height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;'>
+                                                                                <p style='width: 100px; margin-bottom: 0; margin-top: -6px;'>&nbsp&nbsp&nbsp&nbspOnline</p>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </a>
+                                                        ";
+                                                    }
+                                                ?>
+                                                
                                             </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                            <nav aria-label="Page navigation example" style="margin-top: 20px;">
+                            <!-- <nav aria-label="Page navigation example" style="margin-top: 20px;">
                                 <ul class="pagination">
                                     <li class="page-item"><a class="page-link" href="#">Previous</a></li>
                                     <li class="page-item active"><a class="page-link" href="#">1</a></li>
@@ -223,7 +145,7 @@
                                     <li class="page-item"><a class="page-link" href="#">3</a></li>
                                     <li class="page-item"><a class="page-link" href="#">Next</a></li>
                                 </ul>
-                            </nav>
+                            </nav> -->
                         </div>
                         
                     </div>
