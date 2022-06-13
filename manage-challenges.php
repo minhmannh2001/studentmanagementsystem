@@ -229,7 +229,11 @@
                                         <tr>
                                             <th>No</th>
                                             <th>Title</th>
-                                            <th>Content</th>
+                                            <?php
+                                                if ($position == "Teacher") {
+                                                    echo "<th>Content</th>";
+                                                }
+                                            ?>
                                             <th>Creator</th>
                                             <th>Number Of Participants</th>
                                             <th>Creation Date</th>
@@ -241,7 +245,11 @@
                                         <tr>
                                             <th>No</th>
                                             <th>Title</th>
-                                            <th>Content</th>
+                                            <?php
+                                                if ($position == "Teacher") {
+                                                    echo "<th>Content</th>";
+                                                }
+                                            ?>
                                             <th>Creator</th>
                                             <th>Number Of Participants</th>
                                             <th>Creation Date</th>
@@ -304,10 +312,6 @@
                                                     <tr>
                                                         <td>$count</td>
                                                         <td>$table_challenge_title</td>
-                                                        <td class='d-flex justify-content-between'>
-                                                            <p style='margin-bottom: 0px;'>$table_challenge_content</p>
-                                                            <a href='download.php?path=challenges/$table_challenge_content'>Download</a>
-                                                        </td>
                                                         <td>$table_challenge_creator_name</td>
                                                         <td>$table_challenge_no_participants</td>
                                                         <td>$table_challenge_creation_date</td>

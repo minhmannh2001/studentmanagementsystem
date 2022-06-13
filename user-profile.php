@@ -176,7 +176,7 @@
                                     }
                                 ?>
                                 <?php
-                                    if ($position == "Teacher" or $user_profile == "") {
+                                    if ($position == "Teacher" or $user_profile == "" or ($user_profile != "" and $username == $user_profile)) {
                                         echo "
                                             <form action='user-detail.php' method='POST'>
                                                 <input type='hidden' name='username' value='$username'>
@@ -188,12 +188,15 @@
                                 
                                 ?>
                                 <?php
-                                    if ($user_profile != "") {
-                                        echo '<form action="">
-                                            <label for="message" style="margin-top: 20px;"><h5>Write message:</h5></label>
-                                            <textarea required="true" placeholder="Write something..." id="message" name="message" style="width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;"></textarea>                                     
-                                            <input type="submit" value="Send" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 15px;">
-                                        </form>';
+                                    if ($user_profile != "" and $username != $user_profile) {
+                                        echo "
+                                        <form action='save-message.php' method='POST'>
+                                            <input type='hidden' name='sender_username' value='$username'>
+                                            <input type='hidden' name='receiver_username' value='$user_account'>
+                                            <label for='message' style='margin-top: 20px;'><h5>Write message:</h5></label>
+                                            <textarea required='true' placeholder='Write something...' id='message' name='message' style='width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;'></textarea>                                     
+                                            <input type='submit' value='Send' name='sendmessage' style='background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; margin-bottom: 15px;'>
+                                        </form>";
                                     }
                                 ?>
                             </div>

@@ -1,3 +1,31 @@
+<?php
+    $warning = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+    
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        // roll back the transaction if something failed
+        $conn->rollback();
+        echo "Error: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+
+
+
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,7 +34,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Dashboard - Student Management System</title>
+        <title>Message Section - Student Management System</title>
         <link href="https://cdn.jsdelivr.net/npm/simple-datatables@latest/dist/style.css" rel="stylesheet" />
         <link href="css/styles2.css" rel="stylesheet" />
         <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
@@ -30,16 +58,14 @@
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid px-4">
-                        <h1 class="mt-4">Messenger</h1>
+                        <h1 class="mt-4">Message Section</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
-                            <li class="breadcrumb-item active">Messenger</li>
+                            <li class="breadcrumb-item active">Message Section</li>
                         </ol>
                         <div class="row">
                             <div class="col-md-12 grid-margin">
-                                <div class="d-flex align-items-center">                              
-                                    <span style="height: 15px; width: 15px; background-color: #6cc16f; border-radius: 50%; display: inline-block;"></span>&nbsp<p style="margin-bottom: 0;">Online users: 5</p>
-                                    &nbsp&nbsp&nbsp&nbsp
+                                <div class="d-flex align-items-center">
                                     <span style="height: 15px; width: 15px; background-color: #f4ba60; border-radius: 50%; display: inline-block;"></span>&nbsp<p style="margin-bottom: 0;">Waiting messages: 2</p>                             
                                 </div>
                                 <div>

@@ -7,33 +7,34 @@
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Dashboard
                             </a>
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-class" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Classes
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts-class" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="add-classes.php">Add Classes</a>
-                                    <a class="nav-link" href="manage-classes.php">Manage Classes</a>
-                                </nav>
-                            </div>
-
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-teacher" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Teachers
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts-teacher" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="add-teachers.php">Add Teachers</a>
-                                    <a class="nav-link" href="manage-teachers.php">Manage Teachers</a>
-                                </nav>
-                            </div>
+                            
 
                             <?php
                                 if ($position == "Teacher") {
                                     echo "
+                                        <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-class' aria-expanded='false' aria-controls='collapseLayouts'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
+                                            Classes
+                                            <div class='sb-sidenav-collapse-arrow'><i class='fas fa-angle-down'></i></div>
+                                        </a>
+                                        <div class='collapse' id='collapseLayouts-class' aria-labelledby='headingOne' data-bs-parent='#sidenavAccordion'>
+                                            <nav class='sb-sidenav-menu-nested nav'>
+                                                <a class='nav-link' href='add-classes.php'>Add Classes</a>
+                                                <a class='nav-link' href='manage-classes.php'>Manage Classes</a>
+                                            </nav>
+                                        </div>
+            
+                                        <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-teacher' aria-expanded='false' aria-controls='collapseLayouts'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
+                                            Teachers
+                                            <div class='sb-sidenav-collapse-arrow'><i class='fas fa-angle-down'></i></div>
+                                        </a>
+                                        <div class='collapse' id='collapseLayouts-teacher' aria-labelledby='headingOne' data-bs-parent='#sidenavAccordion'>
+                                            <nav class='sb-sidenav-menu-nested nav'>
+                                                <a class='nav-link' href='add-teachers.php'>Add Teachers</a>
+                                                <a class='nav-link' href='manage-teachers.php'>Manage Teachers</a>
+                                            </nav>
+                                        </div>
                                         <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-student' aria-expanded='false' aria-controls='collapseLayouts'>
                                         <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
                                         Students
@@ -57,6 +58,17 @@
                                                 <a class='nav-link' href='manage-exams.php'>Manage Exams</a>
                                             </nav>
                                         </div>
+                                        <a class='nav-link collapsed' href='#' data-bs-toggle='collapse' data-bs-target='#collapseLayouts-challenge' aria-expanded='false' aria-controls='collapseLayouts'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-columns'></i></div>
+                                            Challenges
+                                            <div class='sb-sidenav-collapse-arrow'><i class='fas fa-angle-down'></i></div>
+                                        </a>
+                                        <div class='collapse' id='collapseLayouts-challenge' aria-labelledby='headingOne' data-bs-parent='#sidenavAccordion'>
+                                            <nav class='sb-sidenav-menu-nested nav'>
+                                                <a class='nav-link' href='add-challenges.php'>Add Challenges</a>
+                                                <a class='nav-link' href='manage-challenges.php'>Manage Challenges</a>
+                                            </nav>
+                                        </div>
                                     ";
                                 } else {
                                     echo "
@@ -64,7 +76,10 @@
                                             <div class='sb-nav-link-icon'><i class='fas fa-tachometer-alt'></i></div>
                                             Exam List
                                         </a>
-                                
+                                        <a class='nav-link' href='manage-challenges.php'>
+                                            <div class='sb-nav-link-icon'><i class='fas fa-tachometer-alt'></i></div>
+                                            Challenge List
+                                        </a>
                                     ";
                                 }
                             ?>
@@ -72,17 +87,7 @@
 
                             
 
-                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts-challenge" aria-expanded="false" aria-controls="collapseLayouts">
-                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
-                                Challenges
-                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                            </a>
-                            <div class="collapse" id="collapseLayouts-challenge" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                                <nav class="sb-sidenav-menu-nested nav">
-                                    <a class="nav-link" href="add-challenges.php">Add Challenges</a>
-                                    <a class="nav-link" href="manage-challenges.php">Manage Challenges</a>
-                                </nav>
-                            </div>
+                            
                             
                             <a class="nav-link" href="all-users.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
