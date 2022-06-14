@@ -22,6 +22,10 @@
         header('Location: 500.html', true, 301);
     }
 
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
 ?>
 
 <!DOCTYPE html>

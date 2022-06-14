@@ -17,6 +17,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
@@ -226,6 +230,8 @@
                                                 $teacher_username = $teacher['user_account'];
                                                 if ($teacher['user_class'] == '') {
                                                     $teacher_class = 'Not Set';
+                                                } else {
+                                                    $teacher_class = $teacher['user_class'];
                                                 }
                                                 $teacher_position = $teacher['user_position'];
                                                 $teacher_email = $teacher['user_email'];

@@ -17,6 +17,10 @@
         header('Location: 401.html', true, 301);
     }
 
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
@@ -198,7 +202,7 @@
                                                 <input required="true" type="file" id="examsubject"  accept=".docx, .pdf"  name="examsubject" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <label for="examexpirationdate">Expiration Date</label>
-                                                <input  value="<?php if ($form_exam_expiration_date != "" and $_SESSION['add-item-success'] == "false") { echo "$form_exam_expiration_date"; } ?>" type="date" id="examexpirationdate" name="examexpirationdate" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
+                                                <input value="<?php if ($form_exam_expiration_date != "" and $_SESSION['add-item-success'] == "false") { echo "$form_exam_expiration_date"; } ?>" type="date" id="examexpirationdate" name="examexpirationdate" style="width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;">
 
                                                 <input type="submit" value="Add" name="add" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
                                             </form>

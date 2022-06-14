@@ -1,3 +1,56 @@
+<?php
+    $warning = '';
+    
+    session_start();
+    $username = $_SESSION['username'];
+    $email = $_SESSION['email'];
+    $position = $_SESSION['position'];
+    
+    $db_servername = "localhost";
+    $db_username = "root";
+    $db_password = "";
+    $db_name = "test";
+
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
+    try {
+        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        // set the PDO error mode to exception
+        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    } catch(PDOException $e) {
+        // roll back the transaction if something failed
+        $conn->rollback();
+        echo "Error: " . $e->getMessage();
+        header('Location: 500.html', true, 301);
+    }
+
+    $owner_id = $_GET['owner_id'];
+    $guest_id = $_GET['guest_id'];
+
+
+    $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account;");
+    $stmt->bindParam(':user_account', $username);
+    $stmt->execute();
+    $result = $stmt->fetch(PDO::FETCH_ASSOC);
+    $current_user_id = $result['user_id'];
+
+    if ($owner_id != $current_user_id) {
+        header('Location: 401.html', true, 301);
+    }
+
+    $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
+    $stmt->bindParam(':user_id', $guest_id);
+    $stmt->execute();
+    $guest_information = $stmt->fetch(PDO::FETCH_ASSOC);
+    $guest_email = $guest_information['user_email'];
+    $guest_account = $guest_information['user_account'];
+    $guest_name = $guest_information['user_firstname'] . " " . $guest_information['user_lastname'];
+    $guest_photo = $guest_information['user_photo'];
+    $guest_photo_url = 'images/' . $guest_photo;
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -33,12 +86,20 @@
                         <h1 class="mt-4">Messenger</h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
+                            <li class="breadcrumb-item"><a href="message-section.php">Message Section</a></li>
                             <li class="breadcrumb-item active">Messenger</li>
                         </ol>
                         <div class="row">
-                            <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg" class="user-image">
+                            <?php
+                                if ($guest_photo_url == "images/") {
+                                    echo "<img src='https://dummyimage.com/100x100/343a40/6c757d' alt='' class='user-image'>";
+                                }
+                                else {
+                                    echo "<div style='background-image: url(" . "$guest_photo_url" . "); width: 100px; height: 100px; background-size: cover;' class='user-image'></div>";
+                                }
+                            ?>
                             <a href="user-profile.php" style="color: inherit; text-decoration: none;">
-                                <h4 style="margin-bottom: 0px;">Miro Badev</h4>
+                                <h4 style="margin-bottom: 0px;"><?php echo "$guest_name" ?></h4>
                             </a>
                             <div class="col-md-12 grid-margin">
                                 <div class="d-flex align-items-center">                              
@@ -47,39 +108,78 @@
                             </div>
                             <div class="row" style="margin-top: 15px;">
                                 <div class="card" style="padding-top: 20px; padding-bottom: 10px;">
-                                    <div class="col-md-12 grid-margin d-flex flex-column" style="margin-bottom: 15px;">
-                                        <div class="card" style="background-color: #f0f4f7;">
-                                            <div class="card-body d-flex flex-column">
-                                                <div style="margin-left: auto">Hello</div>
-                                            </div>
-                                        </div>
-                                        <div style="margin-left: auto; color: #707880; margin-top: 5px;">
-                                            From Miro Badev,&nbsp&nbspsent at 11:05 3/6/2022
-                                        </div>
-                                    </div>
-                                    <div class="col-md-12 grid-margin d-flex flex-column">
-                                        <div class="card" style="background-color: #f0f4f7;">
-                                            <div class="card-body d-flex justify-content-between">
-                                                <div>Hi</div>
-                                                <a href="">Modify</a>
-                                            </div>
-                                        </div>
-                                        <div style="color: #707880; margin-top: 5px;">
-                                            From me,&nbsp&nbspsent at 11:05 3/6/2022
-                                        </div>
-                                    </div>
+                                <?php
+                                    $stmt = $conn->prepare("SELECT * FROM Contacts WHERE (contact_guest_id=:contact_guest_id AND contact_owner_id=:contact_owner_id) OR (contact_owner_id=:contact_guest_id AND contact_guest_id=:contact_owner_id) ORDER BY contact_id, contact_date ASC");
+                                    $stmt->bindParam(':contact_owner_id', $current_user_id);
+                                    $stmt->bindParam(':contact_guest_id', $guest_id);
+                                    $stmt->execute();
+                                    $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+                                    foreach ($results as $result) {
+                                        $contact_owner_id = $result['contact_owner_id'];
+                                        $contact_guest_id = $result['contact_guest_id'];
+                                        $contact_message = $result['contact_message'];
+                                        $contact_date = $result['contact_date'];
+                                        $contact_date = date_create($contact_date);
+                                        $contact_date = date_format($contact_date, "H:i d/m/Y");
+                                        $contact_status = $result['contact_status'];
+                                        $contact_is_modified = $result['contact_is_modified'];
+
+                                        echo "
+                                            <div class='col-md-12 grid-margin d-flex flex-column' style='margin-bottom: 15px;'>
+                                                <div class='card' style='background-color: #f0f4f7;'>
+                                                    <div class='card-body d-flex flex-column'>
+                                        ";
+                                        if ($contact_owner_id == $current_user_id) {
+                                            echo "
+                                                        <div>$contact_message</div>
+                                                    </div>
+                                                </div>
+                                            ";
+                                        } else if ($contact_guest_id == $current_user_id) {
+                                            echo "
+                                                        <div style='margin-left: auto'>$contact_message</div>
+                                                    </div>
+                                                </div>
+                                            ";
+                                            $stmt = $conn->prepare("UPDATE Contacts SET contact_status = 'seen' WHERE (contact_guest_id=:contact_guest_id AND contact_owner_id=:contact_owner_id)");
+                                            $stmt->bindParam(':contact_owner_id', $guest_id);
+                                            $stmt->bindParam(':contact_guest_id', $current_user_id);
+                                            $stmt->execute();
+                                        }
+                                        if ($contact_owner_id == $current_user_id) {
+                                            echo "
+                                                    <div style='color: #707880; margin-top: 5px;'>
+                                                        From me, sent at $contact_date
+                                                    </div>
+                                                </div>
+                                            ";
+                                        } else if ($contact_guest_id == $current_user_id) {
+                                            echo "
+                                                    <div style='margin-left: auto; color: #707880; margin-top: 5px;'>
+                                                        From $guest_name,&nbsp&nbspsent at $contact_date
+                                                    </div>
+                                                </div>
+                                            ";
+                                        }
+                                    }
+                                ?>
+                                    
                                 
                                 </div>
                             </div>
-                            <form action="">
+                            <form action="save-message.php" method="POST">
+                                <input type="hidden" name="sender_username" value="<?php echo $username; ?>">
+                                <input type="hidden" name="receiver_username" value="<?php echo $guest_account; ?>">
                                 <label for="message" style="margin-top: 20px;"><h5>Write message:</h5></label>
                                 <textarea required="true" placeholder="Write something..." id="message" name="message" style="width: 99%; padding: 12px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; margin-top: 6px; margin-bottom: 16px; resize: vertical;"></textarea>                                     
-                                <input type="submit" value="Send" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
+                                <input type="submit" value="Send" name="sendmessage" style="background-color: #0d6efd; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer;">
                             </form>
                         </div>
                         
                     </div>
                 </main>
+                <div id="snackbar">Send message successfully.</div>
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid px-4">
                         <div class="d-flex align-items-center justify-content-between small">
@@ -101,5 +201,31 @@
         <script src="assets/demo/chart-bar-demo.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/simple-datatables@latest" crossorigin="anonymous"></script>
         <script src="js/datatables-simple-demo.js"></script>
+        <script>
+            function mySnackbar() {
+                // Get the snackbar DIV
+                var x = document.getElementById("snackbar");
+                
+                console.log(x);
+
+                // Add the "show" class to DIV
+                x.className = "show";
+
+                // After 3 seconds, remove the show class from DIV
+                setTimeout(function(){ x.className = x.className.replace("show", ""); }, 3000);
+            } 
+
+            <?php
+                $add_item_success = $_SESSION['add-item-success'];
+                if ($add_item_success == "true") {
+                    echo "
+                        window.onload = function() {
+                            mySnackbar()
+                        };
+                    ";
+                }
+                $_SESSION['add-item-success'] = "false";
+            ?>
+        </script>
     </body>
 </html>

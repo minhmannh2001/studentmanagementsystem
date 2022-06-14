@@ -76,5 +76,6 @@
         $stmt->execute();
 
         header('Location: ' . $_SERVER['HTTP_REFERER']);
+        $_SESSION['add-item-success'] = "true";
     }
 ?>

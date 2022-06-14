@@ -11,6 +11,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
     try {
         $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
@@ -71,12 +75,17 @@
                                         $result = $stmt->fetch(PDO::FETCH_ASSOC);
                                         $current_user_id = $result['user_id'];
 
-                                        $stmt = $conn->prepare("SELECT DISTINCT contact_owner_id, contact_guest_id, contact_status FROM Contacts WHERE contact_guest_id=:contact_guest_id");
+                                        $stmt = $conn->prepare("SELECT DISTINCT contact_owner_id, contact_guest_id, contact_status FROM Contacts WHERE contact_guest_id=:contact_guest_id AND contact_status = 'waiting'");
                                         $stmt->bindParam(':contact_guest_id', $current_user_id);
                                         $stmt->execute();
                                         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                         $total_no_waiting_message = count($results);
+
+                                        $stmt = $conn->prepare("SELECT DISTINCT contact_owner_id, contact_guest_id FROM Contacts WHERE contact_guest_id=:contact_guest_id OR contact_owner_id=:contact_guest_id");
+                                        $stmt->bindParam(':contact_guest_id', $current_user_id);
+                                        $stmt->execute();
+                                        $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
                                     ?>
                                     <span style="height: 15px; width: 15px; background-color: #f4ba60; border-radius: 50%; display: inline-block;"></span>&nbsp<p style="margin-bottom: 0;">Waiting messages: <?php echo "$total_no_waiting_message"; ?></p>                             
@@ -94,41 +103,81 @@
                                         <div class="card-body">
                                             <div>
                                                 <?php
-                                                    foreach ($results as $result) {
-                                                        $contact_user_id = $result['contact_owner_id'];
-                                                        $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
-                                                        $stmt->bindParam(':user_id', $contact_user_id);
-                                                        $stmt->execute();
-                                                        $contact_user_information = $stmt->fetch(PDO::FETCH_ASSOC);
-                                                        $contact_user_email = $contact_user_information['user_email'];
-                                                        $contact_user_name = $contact_user_information['user_firstname'] . " " . $contact_user_information['user_lastname'];
-                                                        $contact_user_photo = $contact_user_information['user_photo'];
-                                                        $contact_user_photo_url = 'images/' . $contact_user_photo;
-                                                        echo "
-                                                            <a href='messenger.php' style='text-decoration: none; color: inherit;'>
-                                                                <div class='d-flex friend' style='border-bottom:1px solid #e7ebee;'>
+                                                    if (count($results) == 0) {
+                                                        echo "You don't have any contact to anyone.";
+                                                    } else {
+                                                        $already_show = [];
+                                                        foreach ($results as $result) {
+                                                            $contact_user_id = $result['contact_owner_id'];
+                                                            if ($contact_user_id == $current_user_id) {
+                                                                $contact_user_id = $result['contact_guest_id'];
+                                                                if (!in_array($contact_user_id, $already_show)) {
+                                                                    array_push($already_show, $contact_user_id);
+                                                                } else {
+                                                                    continue;
+                                                                }
+                                                            } else {
+                                                                if (!in_array($contact_user_id, $already_show)) {
+                                                                    array_push($already_show, $contact_user_id);
+                                                                } else {
+                                                                    continue;
+                                                                }
+                                                            }
+                                                            $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
+                                                            $stmt->bindParam(':user_id', $contact_user_id);
+                                                            $stmt->execute();
+                                                            $contact_user_information = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                            $contact_user_email = $contact_user_information['user_email'];
+                                                            $contact_user_name = $contact_user_information['user_firstname'] . " " . $contact_user_information['user_lastname'];
+                                                            $contact_user_photo = $contact_user_information['user_photo'];
+                                                            $contact_user_photo_url = 'images/' . $contact_user_photo;
+                                                            echo "
+                                                                <a href='messenger.php?owner_id=$current_user_id&guest_id=$contact_user_id' style='text-decoration: none; color: inherit;'>
+                                                                    <div class='d-flex friend' style='border-bottom:1px solid #e7ebee;'>
+                                                                ";
+                                                                if ($contact_user_photo_url == "images/") {
+                                                                    echo "<img src='https://dummyimage.com/100x100/343a40/6c757d' alt='' class='user-image'>";
+                                                                }
+                                                                else {
+                                                                    echo "<div style='background-image: url(" . "$contact_user_photo_url" . "); width: 100px; height: 100px; background-size: cover;' class='user-image'></div>";
+                                                                }
+                                                            echo "
+                                                                        <div class='d-flex flex-column justify-content-center'>
+                                                                            <p class='username' style='margin-bottom: 5px;'><strong>$contact_user_name</strong></p>
+                                                                            <p class='email'>$contact_user_email</p>
                                                             ";
-                                                            if ($contact_user_photo_url == "images/") {
-                                                                echo "<img src='https://dummyimage.com/200x200/343a40/6c757d' alt='' class='user-image'>";
-                                                            }
-                                                            else {
-                                                                echo "<div style='background-image: url(" . "$contact_user_photo_url" . "); width: 100px; height: 100px; background-size: cover;' class='user-image'></div>";
-                                                            }
-                                                            // <img src='https://s3-us-west-2.amazonaws.com/s.cdpn.io/245657/1_copy.jpg' class='user-image'>
-                                                        echo "
-                                                                    <div class='d-flex flex-column justify-content-center'>
-                                                                        <p class='username' style='margin-bottom: 5px;'><strong>$contact_user_name</strong></p>
-                                                                        <p class='email'>$contact_user_email</p>
-                                                        ";
-                                                        echo "
-                                                                        <div class='d-flex align-items-center'>
-                                                                                <span style='height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;'>
-                                                                                <p style='width: 100px; margin-bottom: 0; margin-top: -6px;'>&nbsp&nbsp&nbsp&nbspOnline</p>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            </a>
-                                                        ";
+                                                            if ($contact_user_id != $current_user_id) {
+                                                                $stmt = $conn->prepare("SELECT * FROM Contacts WHERE (contact_guest_id=:contact_guest_id AND contact_owner_id=:contact_owner_id) AND contact_status='waiting'");
+                                                                
+                                                                $stmt->bindParam(':contact_owner_id', $contact_user_id);
+                                                                $stmt->bindParam(':contact_guest_id', $current_user_id);
+                                                                $stmt->execute();
+                                                                $results = $stmt->fetchAll();
+                                                                if (count($results) == 0) {
+                                                                    echo "
+                                                                                    <div class='d-flex align-items-center'>
+                                                                                            <span style='height: 10px; width: 10px; background-color: #6cc16f; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;'>
+                                                                                            <p style='width: 100px; margin-bottom: 0; margin-top: -6px;'>&nbsp&nbsp&nbsp&nbspOnline</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </a>
+                                                                    ";
+                                                                }
+                                                                else {
+                                                                    echo "
+                                                                                    <div class='d-flex align-items-center'>
+                                                                                            <span style='height: 10px; width: 10px; background-color: #f4ba60; border-radius: 50%; display: inline-block; margin: 7px; margin-left: 0px;'>
+                                                                                            <p style='width: 100px; margin-bottom: 0; margin-top: -6px;'>&nbsp&nbsp&nbsp&nbspWaiting</p>
+                                                                                    </div>
+                                                                                </div>
+                                                                            </div>
+                                                                        </a>
+                                                                    ";
+                                                                }
+                                                            } 
+                                                        }
+                                                    
                                                     }
                                                 ?>
                                                 

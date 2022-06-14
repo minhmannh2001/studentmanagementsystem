@@ -20,7 +20,11 @@
     }
 
     if ($position == 'Student') {
-        header('Location: challenge-detail-for-students.php', true, 301);
+        header('Location: exam-detail-for-students.php', true, 301);
+    }
+
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
     }
 
     try {
@@ -41,7 +45,7 @@
             $_SESSION['challengeid-from-challenge-detail'] = "";
         }
         if ($_SESSION['challengeid-from-challenge-detail'] == "") {
-            $_SESSION['challengeid-from-challenge-detail'] = $_GET['challengeid'];
+            $_SESSION['challengeid-from-challenge-detail'] = $_GET['examid'];
         }
         if ($form_challenge_id == "" and isset($_SESSION['challengeid-from-challenge-detail'])) {
             $form_challenge_id = $_SESSION['challengeid-from-challenge-detail'];
@@ -69,11 +73,24 @@
         $show_challenge_expiration_date = $challenge['challenge_expiration_date'];
         $show_challenge_expiration_date = date_create($show_challenge_expiration_date);
         $show_challenge_expiration_date = date_format($show_challenge_expiration_date, "H:i d/m/Y");
-        $show_challenge_no_participants = $challenge['challenge_no_participants'];
+
         $stmt = $conn->prepare("SELECT * FROM Users WHERE user_position='Student';");
         $stmt->execute();
         $result = $stmt->fetchAll();
         $total_nb_of_students = count($result);
+    }
+
+
+    if (isset($_POST['mark'])) {
+        $student_score = $_POST['marknumber'];
+        $form_exam_list_id = $_POST['examlistid'];
+        $form_exam_participant_id = $_POST['examparticipantid'];
+        $stmt = $conn->prepare("UPDATE ParticipantList SET participant_score=:participant_score WHERE list_id=:list_id AND participant_id=:participant_id;");
+        $stmt->bindParam(':participant_score', $student_score);
+        $stmt->bindParam(':list_id', $form_exam_list_id);
+        $stmt->bindParam(':participant_id', $form_exam_participant_id);
+        $stmt->execute();
+        $_SESSION['add-item-success'] = "true";
     }
                   
 ?>
@@ -101,18 +118,7 @@
                         <h1 class="mt-4"><?php echo "$show_challenge_title"; ?></h1>
                         <ol class="breadcrumb mb-4">
                             <li class="breadcrumb-item"><a href="admin-panel.php">Dashboard</a></li>
-                            <?php
-                                if ($position == 'Teacher') {
-                                    echo "
-                                        <li class='breadcrumb-item'><a href='manage-challenges.php'>Manage Challenges</a></li>
-                                    ";
-                                } else {
-                                    echo "
-                                        <li class='breadcrumb-item'><a href='manage-challenges.php'>Challenge List</a></li>
-                                    ";
-                                }
-                            ?>
-                            
+                            <li class="breadcrumb-item"><a href="manage-exams.php">Manage Challenges</a></li>
                             <li class="breadcrumb-item active">Challenge Detail</li>
                         </ol>
                         <hr>
@@ -124,8 +130,8 @@
                                     <p><a href="user-profile.php?username=<?php echo "$show_challenge_creator_username"; ?>" style="text-decoration: none;"><?php echo "$show_challenge_creator_name"; ?></a></p>
                                 </div>
                                 <div class="d-flex align-items-center">
-                                    <p>Total Participants:&nbsp</p>
-                                    <p><?php echo "$show_challenge_no_participants/$total_nb_of_students students"; ?></p>
+                                    <p>Total Students:&nbsp</p>
+                                    <p><?php echo "$total_nb_of_students"; ?></p>
                                 </div>
                                 <div class="d-flex align-items-center">
                                     <p style="margin-bottom: 0;">Subject:&nbsp</p>
@@ -148,7 +154,7 @@
                         </div>
                         <hr>
                         <?php
-                            $stmt = $conn->prepare("SELECT * FROM ParticipantList WHERE list_id=:list_id AND challenge_submission IS NOT NULL ORDER BY participant_submit_date, participant_score;");
+                            $stmt = $conn->prepare("SELECT * FROM ParticipantList WHERE list_id=:list_id AND exam_submission IS NOT NULL ORDER BY participant_submit_date;");
                             $stmt->bindParam(':list_id', $show_challenge_list_id);
                             $stmt->execute();
                             $results = $stmt->fetchAll();
@@ -169,10 +175,10 @@
                                             <th>Student ID</th>
                                             <th>Student Name</th>
                                             <th>Class</th>
-                                            <th>Submission State</th>
-                                            <th>Answer</th>
+                                            <th>State</th>
+                                            <th>Assignment</th>
                                             <th>Submission Date</th>
-                                            <th>Answer State</th>
+                                            <th>Grade</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
@@ -181,72 +187,172 @@
                                             <th>Student ID</th>
                                             <th>Student Name</th>
                                             <th>Class</th>
-                                            <th>Submission State</th>
-                                            <th>Answer</th>
+                                            <th>State</th>
+                                            <th>Assignment</th>
                                             <th>Submission Date</th>
-                                            <th>Answer State</th>
+                                            <th>Grade</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
-                                    <?php
+                                        <?php
                                             $count = 1;
                                             foreach ($results as $result) {
-                                                $challenge_participant_id = $result['participant_id'];
+                                                $exam_participant_id = $result['participant_id'];
                                                 $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
-                                                $stmt->bindParam(':user_id', $challenge_participant_id);
+                                                $stmt->bindParam(':user_id', $exam_participant_id);
                                                 $stmt->execute();
                                                 $student = $stmt->fetch(PDO::FETCH_ASSOC);
-                                                $challenge_student_name = $student['user_firstname'] . " " . $student['user_lastname'];
-                                                $challenge_student_class = $student['user_class'];
-                                                
+                                                $exam_student_name = $student['user_firstname'] . " " . $student['user_lastname'];
+                                                $exam_student_class = $student['user_class'];
+                                                if ($result['participant_submit_date'] != "") {
                                                     echo "
                                                         <tr>
                                                             <td>$count</td>
-                                                            <td>$challenge_participant_id</td>
-                                                            <td>$challenge_student_name</td>
-                                                            <td>$challenge_student_class</td>
+                                                            <td>$exam_participant_id</td>
+                                                            <td>$exam_student_name</td>
+                                                            <td>$exam_student_class</td>
                                                     ";
-                                                
-                                                $stmt = $conn->prepare("SELECT * FROM Challenges WHERE challenge_participant_list_id=:challenge_participant_list_id;");
-                                                $stmt->bindParam(':challenge_participant_list_id', $show_challenge_list_id);
+                                                } else {
+                                                    echo "
+                                                        <tr>
+                                                            <td style='color: #c0c0c0;'>$count</td>
+                                                            <td style='color: #c0c0c0;'>$exam_participant_id</td>
+                                                            <td style='color: #c0c0c0;'>$exam_student_name</td>
+                                                            <td style='color: #c0c0c0;'>$exam_student_class</td>
+                                                    ";
+                                                }
+                                                $stmt = $conn->prepare("SELECT * FROM Exams WHERE exam_participant_list_id=:exam_participant_list_id;");
+                                                $stmt->bindParam(':exam_participant_list_id', $exam_list_id);
                                                 $stmt->execute();
-                                                $challenge = $stmt->fetch(PDO::FETCH_ASSOC);
-                                                if ($result['participant_submit_date'] < $challenge['challenge_expiration_date']) {
+                                                $exam = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                if ($result['participant_submit_date'] != "" and $result['participant_submit_date'] < $exam['exam_expiration_date']) {
                                                     echo "<td style='color: #226f61;'>Submitted</td>";
-                                                } else {
+                                                } else if ($result['participant_submit_date'] != "") {
                                                     echo "
-                                                        <td style='color: red;'>Late Submitted</td>
-                                                    ";
-                                                }
-                                                
-                                                $student_submit_file = $result['challenge_submission'];
-                                                echo "
-                                                    <td class='d-flex justify-content-between'>
-                                                        <p style='margin-bottom: 0px;'>$student_submit_file</p>
-                                                        <a href='download.php?path=submission/$student_submit_file'>Download</a>
-                                                    </td>
-                                                ";
-                                                $show_challenge_submit_date = date_create($result['participant_submit_date']);
-                                                $show_challenge_submit_date = date_format($show_challenge_submit_date, "H:i d/m/Y");
-                                                if ($result['participant_submit_date'] < $challenge['challenge_expiration_date']) {
-                                                    echo "
-                                                        <td>$show_challenge_submit_date</td>
+                                                            <td style='color: red;'>Late Submitted</td>
                                                     ";
                                                 } else {
                                                     echo "
-                                                        <td style='color: red;'>$show_challenge_submit_date</td>
+                                                            <td style='color: #c0c0c0;'> t Submitted</td>
                                                     ";
                                                 }
                                                 
-                                                $student_score = $result['participant_score'];
-                                                if ($student_score == 10) {
-                                                    echo "<td>Correct</td>";
-                                                } else if ($student_score == 0) {
-                                                    echo "<td>Incorrect</td>";
+                                                if ($result['participant_submit_date'] != "") {
+                                                    $student_submit_file = $result['exam_submission'];
+                                                    echo "
+                                                            <td class='d-flex justify-content-between'>
+                                                                <p style='margin-bottom: 0px;'>$student_submit_file</p>
+                                                                <a href='download.php?path=submission/$student_submit_file'>Download</a>
+                                                            </td>
+                                                    ";
+                                                } else {
+                                                    echo "
+                                                            <td></td>
+                                                    ";
+                                                }
+                                                $show_exam_submit_date = date_create($result['participant_submit_date']);
+                                                $show_exam_submit_date = date_format($show_exam_submit_date, "H:i d/m/Y");
+                                                if ($result['participant_submit_date'] != "" and $result['participant_submit_date'] < $exam['exam_expiration_date']) {
+                                                    echo "
+                                                        <td>$show_exam_submit_date</td>
+                                                    ";
+                                                } else if ($result['participant_submit_date'] != "") {
+                                                    echo "
+                                                        <td style='color: red;'>$show_exam_submit_date</td>
+                                                    ";
+                                                } else {
+                                                    echo "<td></td>";
+                                                }
+                                                $mark_form_appear = $_GET['markformappear'];
+                                                $form_number = $_GET['formnumber'];
+                                               
+                                                if ($mark_form_appear == true and $form_number == $count) {
+                                                    $tmp = $_SERVER['PHP_SELF'];
+                                                    echo "
+                                                        <td>
+                                                            <form action='$tmp' method='POST'>
+                                                                <input type='text' name='marknumber' style='border: 1px solid #ccc; border-radius: 4px; width: 20%;'>
+                                                                <input type='hidden' value='$exam_list_id' name='examlistid'>
+                                                                <input type='hidden' value='$exam_participant_id' name='examparticipantid'>
+                                                                <input type='submit' name = 'mark' value='Save'>
+                                                            </form>
+                                                        </td>
+                                                    ";
+                                                } else if ($result['participant_submit_date'] != "" and $result['participant_score'] == "") {
+                                                    echo "
+                                                            <td>
+                                                            <b>?/10</b>
+                                                            |
+                                                            <a href='?examid=$show_exam_id&markformappear=true&formnumber=$count'>Mark</a>
+                                                            </td>
+                                                        </tr>
+                                                    ";
+                                                } else if ($result['participant_submit_date'] != "") {
+                                                    $exam_student_score = $result['participant_score'];
+                                                    echo "
+                                                        <td>
+                                                            <b>$exam_student_score/10</b>
+                                                            |
+                                                            <a href='?examid=$show_exam_id&markformappear=true&formnumber=$count'>Modify</a>
+                                                        </td>
+                                                    ";
+                                                } else {
+                                                    echo "
+                                                        <td></td>
+                                                    ";
                                                 }
                                                 $count += 1;
                                             }
-                                    ?>
+                                            $stmt = $conn->prepare("SELECT * FROM ParticipantList WHERE list_id=:list_id AND exam_submission IS NULL;");
+                                            $stmt->bindParam(':list_id', $exam_list_id);
+                                            $stmt->execute();
+                                            $results = $stmt->fetchAll();
+                                            foreach ($results as $result) {
+                                                $exam_participant_id = $result['participant_id'];
+                                                $stmt = $conn->prepare("SELECT * FROM Users WHERE user_id=:user_id;");
+                                                $stmt->bindParam(':user_id', $exam_participant_id);
+                                                $stmt->execute();
+                                                $student = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                $exam_student_name = $student['user_firstname'] . " " . $student['user_lastname'];
+                                                $exam_student_class = $student['user_class'];
+                                                if ($result['participant_submit_date'] != "") {
+                                                    echo "
+                                                        <tr>
+                                                            <td>$count</td>
+                                                            <td>$exam_participant_id</td>
+                                                            <td>$exam_student_name</td>
+                                                            <td>$exam_student_class</td>
+                                                    ";
+                                                } else {
+                                                    echo "
+                                                        <tr>
+                                                            <td style='color: #c0c0c0;'>$count</td>
+                                                            <td style='color: #c0c0c0;'>$exam_participant_id</td>
+                                                            <td style='color: #c0c0c0;'>$exam_student_name</td>
+                                                            <td style='color: #c0c0c0;'>$exam_student_class</td>
+                                                    ";
+                                                }
+                                                $stmt = $conn->prepare("SELECT * FROM Exams WHERE exam_participant_list_id=:exam_participant_list_id;");
+                                                $stmt->bindParam(':exam_participant_list_id', $exam_list_id);
+                                                $stmt->execute();
+                                                $exam = $stmt->fetch(PDO::FETCH_ASSOC);
+                                                if ($result['participant_submit_date'] != "" and $result['participant_submit_date'] < $exam['exam_expiration_date']) {
+                                                    echo "<td style='color: #226f61;'>Submitted</td>";
+                                                } else if ($result['participant_submit_date'] != "") {
+                                                    echo "
+                                                            <td style='color: red;'>Late Submitted</td>
+                                                    ";
+                                                } else {
+                                                    echo "
+                                                            <td style='color: #c0c0c0;'>Not Submitted</td>
+                                                    ";
+                                                }
+                                                echo "<td></td>";
+                                                echo "<td></td>";
+                                                echo "<td></td>";
+                                                $count += 1;
+                                            }
+                                        ?>
                                     </tbody>
                                 </table>
                             </div>

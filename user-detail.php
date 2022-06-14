@@ -13,6 +13,10 @@
     $db_password = "";
     $db_name = "test";
 
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
     $user_detail = $_POST['user_username'];
     if ($user_detail != "") {
         $_SESSION['current_user_detail'] = $user_detail;

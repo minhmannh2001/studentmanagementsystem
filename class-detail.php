@@ -17,6 +17,10 @@
         header('Location: 401.html', true, 301);
     }
     
+    if ($username == "") {
+        header('Location: 404.html', true, 301);
+    }
+    
     if (isset($_POST['changeclass'])) {
         try {
 

@@ -86,7 +86,36 @@
                             
 
                             
+                            <?php
+                                $db_servername = "localhost";
+                                $db_username = "root";
+                                $db_password = "";
+                                $db_name = "test";
+                            
+                                try {
+                                    $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+                                    // set the PDO error mode to exception
+                                    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                                    
+                                } catch(PDOException $e) {
+                                    // roll back the transaction if something failed
+                                    $conn->rollback();
+                                    echo "Error: " . $e->getMessage();
+                                    header('Location: 500.html', true, 301);
+                                }
 
+                                $stmt = $conn->prepare("SELECT * FROM Users WHERE user_account = :user_account;");
+                                $stmt->bindParam(':user_account', $username);
+                                $stmt->execute();
+                                $result = $stmt->fetch(PDO::FETCH_ASSOC);
+                                $current_user_id = $result['user_id'];
+
+                                $stmt = $conn->prepare("SELECT DISTINCT contact_owner_id, contact_guest_id, contact_status FROM Contacts WHERE contact_guest_id=:contact_guest_id AND contact_status = 'waiting'");
+                                $stmt->bindParam(':contact_guest_id', $current_user_id);
+                                $stmt->execute();
+                                $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                                $nb_new_meassages = count($results);
+                            ?>
                             
                             
                             <a class="nav-link" href="all-users.php">
@@ -97,7 +126,12 @@
                             <a class="nav-link" href="message-section.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Messenger&nbsp&nbsp
-                                <strong style="color: white;">(1 new)</strong>
+                                <?php
+                                    if ($nb_new_meassages > 0) {
+                                        echo "<strong style='color: white;'>($nb_new_meassages new)</strong>";
+                                    } 
+                                ?>
+                                
                             </a>
                             </div>
                     </div>
