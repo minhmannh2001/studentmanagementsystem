@@ -32,12 +32,11 @@ trả về nội dung bài thơ, văn,… lưu trong file đáp án
 Website có thể hoạt động tốt trên localhost, tuy nhiên gặp lỗi khi deploy online. Hiện tại mình chưa rõ nguyên nhân sinh ra lỗi dù đã loay hoay khá lâu. Do bản thân mình chưa có đủ kinh nghiệm, kiến thức trong việc deploy một trang web. Mình xin phép được demo qua video và hình ảnh, các bạn có thể tải source code về máy để chạy thử.  Nếu bạn nào đã deploy thành công, có thể liên hệ mình để cập nhật lại thông tin trên repo, mình cũng mong có thể giải quyết được lỗi trên.\
 **Video demo**
 Demo Student Using System\
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_student_using_system_part1.mp4 \
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/dem_student_using_system_part2.mkv \
+https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_student_using_system_part1.mp4 
+https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/dem_student_using_system_part2.mkv 
 
 Demo Teacher Using System\
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_teacher_using_system.mkv \
-
+https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_teacher_using_system.mkv
 
 1. Quảng lý người dùng
 Mỗi người dùng đều có một trang cá nhân chứa các thông tin cơ bản và một hộp thoại bên dưới để người dùng khác có thể tương tác.
