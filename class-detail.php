@@ -8,10 +8,7 @@
     
     $_SESSION['change-information'] = "false";
 
-    $db_servername = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $db_name = "test";
+    include 'config.php';
 
     if ($position == "Student") {
         header('Location: 401.html', true, 301);
@@ -23,8 +20,7 @@
     
     if (isset($_POST['changeclass'])) {
         try {
-
-            $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+            $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
             // set the PDO error mode to exception
             $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
@@ -57,7 +53,7 @@
                 }
                 $stmt->execute();
                 if ($form_homeroom_teacher_id != "") {
-                    $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+                    $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
                     // set the PDO error mode to exception
                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                     
@@ -94,7 +90,7 @@
     }
 
     try {
-        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         
@@ -191,7 +187,7 @@
                                                             echo "<option selected value=''>Choose Teacher</option>";
                                                         }
                                                         
-                                                        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+                                                        $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
                                                         // set the PDO error mode to exception
                                                         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 

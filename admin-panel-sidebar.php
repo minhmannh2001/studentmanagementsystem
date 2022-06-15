@@ -93,7 +93,7 @@
                                 $db_name = "test";
                             
                                 try {
-                                    $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+                                    $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
                                     // set the PDO error mode to exception
                                     $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                                     
@@ -129,7 +129,7 @@
                                 <?php
                                     if ($nb_new_meassages > 0) {
                                         echo "<strong style='color: white;'>($nb_new_meassages new)</strong>";
-                                    } 
+                                    }  
                                 ?>
                                 
                             </a>

@@ -8,10 +8,7 @@
 
     $_SESSION['add-item-success'] = "false";
 
-    $db_servername = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $db_name = "test";
+    include 'config.php';
 
     if ($position == "Student") {
         header('Location: 401.html', true, 301);
@@ -22,7 +19,7 @@
     }
 
     try {
-        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password);
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch(PDOException $e) {

@@ -12,17 +12,14 @@
     $just_delete = $_SESSION['just-delete'];
     $_SESSION['just-delete'] = 'false';
 
-    $db_servername = "localhost";
-    $db_username = "root";
-    $db_password = "";
-    $db_name = "test";
+    include 'config.php';
 
     if ($username == "") {
         header('Location: 404.html', true, 301);
     }
     
     try {
-        $conn = new PDO("mysql:host=$db_servername;dbname=$db_name", $db_username, $db_password);
+        $conn = new PDO("mysql:host=$db_servername;port=$db_port;dbname=$db_name", $db_username, $db_password, array(PDO::MYSQL_ATTR_INIT_COMMAND => 'SET NAMES utf8'));
         // set the PDO error mode to exception
         $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     } catch(PDOException $e) {
