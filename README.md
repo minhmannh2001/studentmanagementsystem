@@ -31,13 +31,17 @@ trả về nội dung bài thơ, văn,… lưu trong file đáp án
 ## Demo
 Website có thể hoạt động tốt trên localhost, tuy nhiên gặp lỗi khi deploy online. Hiện tại mình chưa rõ nguyên nhân sinh ra lỗi dù đã loay hoay khá lâu. Do bản thân mình chưa có đủ kinh nghiệm, kiến thức trong việc deploy một trang web. Mình xin phép được demo qua video và hình ảnh, các bạn có thể tải source code về máy để chạy thử.  Nếu bạn nào đã deploy thành công, có thể liên hệ mình để cập nhật lại thông tin trên repo, mình cũng mong có thể giải quyết được lỗi trên.\
 **Video demo**
-Demo Student Using System\
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_student_using_system_part1.mp4 
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/dem_student_using_system_part2.mkv 
+Demo Student Using System
 
-Demo Teacher Using System\
-https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/videos/demo_teacher_using_system.mkv
+https://user-images.githubusercontent.com/81837992/173810234-fea22836-134d-45ef-a5d2-e35ca7ef8fd9.mp4
 
+https://user-images.githubusercontent.com/81837992/173810322-ebfe2ac3-e999-4e4a-a5d3-51b678fbb64a.mp4
+
+Demo Teacher Using System
+
+https://user-images.githubusercontent.com/81837992/173814117-77afb63f-6b21-4b5f-b403-9ce66e1b39c6.mp4
+
+**Demo bằng hình ảnh**
 1. Quảng lý người dùng
 Mỗi người dùng đều có một trang cá nhân chứa các thông tin cơ bản và một hộp thoại bên dưới để người dùng khác có thể tương tác.
 ![enter image description here](https://github.com/minhmannh2001/studentmanagementsystem/blob/main/demo/images/Screenshot%202022-06-15%20at%2009-32-14%20Dashboard%20-%20Student%20Management%20System.png)
