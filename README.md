@@ -41,6 +41,8 @@ Demo Teacher Using System
 
 https://user-images.githubusercontent.com/81837992/173814117-77afb63f-6b21-4b5f-b403-9ce66e1b39c6.mp4
 
+https://user-images.githubusercontent.com/81837992/173815444-b736a77d-e086-452f-859d-01a99cf1a894.mp4
+
 **Demo bằng hình ảnh**
 1. Quảng lý người dùng
 Mỗi người dùng đều có một trang cá nhân chứa các thông tin cơ bản và một hộp thoại bên dưới để người dùng khác có thể tương tác.
